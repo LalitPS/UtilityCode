@@ -87,9 +87,8 @@ import com.orange.util.csm.ConnectionForGOLD;
 import com.orange.util.csm.CustomJTable;
 import com.orange.util.others.MemoryUsages;
 
-
 /*
- * QUERT TO OPTIMISE
+ * QUERY TO OPTIMISE
  * 
  *  SELECT distinct 
         QUOTE.QUOTENUMBER , 
