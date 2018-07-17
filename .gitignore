@@ -1,0 +1,6 @@
+.settings/**
+bin/**
+RemoteSystemsTempFiles/**
+.classpath
+.project
+dependency-reduced-pom.xml
