@@ -3758,6 +3758,4 @@ private void imadaqView() {
 		failedGIds = null;
 	}
 	
-
-	
 }

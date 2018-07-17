@@ -1,0 +1,82 @@
+8.09
+META
+<html><font color=blue size=4><b>New Version 8.09 of Utility is availabe.Please download or Auto update with the latest version. </b>
+STEPS
+<html><font color=green>1. Connect to the FTP Machine
+<html><font color=green>2. Get the new jar 'Imadaq.jar'
+<html><font color=green>3. Delete your exisiting jar.
+<html><font color=green>4. Start your utility from bat file provided.
+<html><font color=orange size=4> OR ,Click on the 'Auto Update' from the running version of the utility from your machine. 
+
+<html><font color=green size=2><b>8.08/09: ADD ELK (ellasticsearch,Kabina , logstash) CONFIGURATION FEATURE.
+<html><font color=green size=2><b>8.07: PUT QUERY LOGS ON REMOTE FEATURE.
+<html><font color=green size=2><b>8.06: ADD QUERY LOGS WITH QUERY START AND ENDS TIME WITH USER FTID.
+<html><font color=green size=2><b>8.05: ENHANCED MUTI FILE SELECTION LIST FOR IMADAQV02 AUTO ANALYSIS.
+<html><font color=green size=2><b>8.04: THEME ORANGE(STANDARD) OR DEFAULT (PREVIOUS). ADD FEATUTE TO GET ORDER AND CHECK IS LINKED WITH MIGRATED SERVICES (PPL LIST)
+<html><font color=green size=2><b>8.03: THEME ORANGE.
+<html><font color=green size=2><b>8.02: BLOCKING USER ACCESS IMPLEMENTATION.
+<html><font color=green size=2><b>8.00: INCLUDES RELASE TYPE META AND PATCH (META UPDATE IS MANADATORY FOR USER)
+<html><font color=green size=2><b>8.00: DATABASE CONFIGURATION FILES CAN NOT BE JUST USED BY ANOTHER USER BY CHANGING FTPID IN FILE NAME.New files also be having FTID info in, and will match with User MACHINE.
+<html><font color=blue size=2><b>7.06: MAVEN INTEGRATIONS. </FONT><font color=RED size=2>Replace  'java -jar Imadaq.jar' <i>with</i> 'java -cp Imadaq.jar com.orange.ui.component.Main' in your batch file.(Imadaq.bat)</FONT>. 
+<html><font color=blue size=2><b>7.05: Enhance IMADAQV02 Feature.
+<html><font color=blue size=2><b>7.04: Disable all Like Queries Option.
+<html><font color=blue size=2><b>7.03: Update HTML Report for IMADAQV02.
+<html><font color=blue size=2><b>7.01/7.02 : Disable Query Executor Feature.
+<html><font color=blue size=2><b>7.01 : User is not authorized/fill any database inforamtion(all will get automatically from utility).
+<html><font color=blue size=2><b>7.01 : All databse related values are encrypted (username/password/sid/host/port/prefix).
+<html><font color=blue size=2><b>7.00 : ADD FEATUTE TO PROVIDE DATABASE PASSWORD FILES TO USER GOLD|CSI|ARCHIVE.
+<html><font color=blue size=2><b>6.41/42 : ADD jar IN LIB.
+<html><font color=blue size=2><b>6.40 : ADD PUBLIC KEY GENERATOR FOR PASSWORDS.
+<html><font color=blue size=2><b>6.33 : ADD VALIDATION FOR TARGET USID IS ALREADY PRESENT ON DIFFERENT NEW ORDER(S).
+<html><font color=blue size=2><b>6.32 : SEPERATE ANALYSIS PROCESS FROM IOV UPDATE PROCESS.
+<html><font color=blue size=2><b>6.31 : ADD AUTO NALAYSIS DATA VALIDATIONS FOR IMADAQ V02.
+<html><font color=blue size=2><b>6.30 : ADD INITAIAL DRAFT OF DATA EXTRACTION REPORT AND AUTO NALAYSIS OF DATA FOR IMADAQ V02.
+<html><font color=blue size=2><b>6.22 : UPDATE MANDATORY FOR LEADING TRAILING SPACE VALIDATION IN DEDUP FILE.
+<html><font color=blue size=2><b>6.21 : UPDATE MODULE FOR IMADAQ V2 FOR ELEMENT AND ATTRIBUTE SERVICE DETAILS EXTRATIONS.
+<html><font color=blue size=2><b>6.20 : NEW MODULE FOR IMADAQ V2.
+<html><font color=blue size=2><b>6.19 : ENHANCE PROCESS BAR AT EVENTS.
+<html><font color=blue size=2><b>6.18 : ADD PROCESS BAR AT EVENTS.
+<html><font color=blue size=2><b>6.17 : UPDATE SQL FOR SRF2 MILESTONE UPDATE.
+<html><font color=blue size=2><b>6.16 : ADD NEW FEATURE TO GET ICO AND IT'S CHILD (TO/2018.009614-A.01).
+<html><font color=blue size=2><b>6.15 : UPDATE SQL ERROR WHILE SELECTING DATE RANGE IN SERVICE BUILD INFO MODULE.
+<html><font color=blue size=2><b>6.14 : Performence Upgradation.
+<html><font color=blue size=2><b>6.13 : Add Option for JSON Extraction fro IO, ID, VersionId etc.
+<html><font color=blue size=2><b>6.12 : Add ICO selection options either End User OR Contracting Party selection in service build extraction option.
+<html><font color=blue size=2><b>6.11 : Change in considerable value logic.
+<html><font color=blue size=2><b>6.10 : Adding User Configuration feature to set utility default behavious as per User needs.
+<html><font color=blue size=2><b>6.00/1/2 : Update Utility for Java 9 compatible.
+<html><font color=blue size=2><b>5.70 : Add New Feature to fix DeliverSRF2Info milestone Orders.
+<html><font color=blue size=2><b>5.63 : Update File Format Feature.
+<html><font color=blue size=2><b>5.62 : ADD GID in Order Hierarchy Module and Remove limit of 999 orders.
+<html><font color=blue size=2><b>5.61 : Integrated HHTML Viewer for Rules Conflicts Analysis Report.
+<html><font color=blue size=2><b>5.60 : Integrated with Fully Automatic Rules Conflicts Analysis feature.
+<html><font color=blue size=2><b>5.53 : Enhance with Auto Analysis of Rules Conflicts feature.
+<html><font color=blue size=2><b>5.52 : Add Initial Rules Conflicts Analysis report feature.
+<html><font color=blue size=2><b>5.51 : Remove the file Name check from feature 'Close Order Check' for Closed Order only in Earrach Module.
+<html><font color=blue size=2><b>5.50 : Add New feature 'Close Order Check' for Closed Order only in Earrach Module.
+<html><font color=blue size=2><b>5.47 : Update Exclude selection in Order Hierarchy Module.
+<html><font color=blue size=2><b>5.46 : in Order Hierarchy Module make selection mandatory.
+<html><font color=blue size=2><b>5.45 : Query Optimization for Milestone (Service Build Module and Order Hierarchy Module ).
+<html><font color=blue size=2><b>5.44 : Prevent Null Pointer in Order Hierarchy Module .
+<html><font color=blue size=2><b>5.42 : ADD EQL2InstanceMapping Analysis Module .
+<html><font color=blue size=2><b>5.41 : ADD UPDATE SCRIPTS ON 'EQL2InstanceMapping' WHILE ANY SITE CHANGE. (ALSO RULES EXTRATION QIERY CHANGE LIKE TO IN)
+<html><font color=blue size=2><b>5.40 : ADD ELEMENT SERVICE BUILD PLACEMENT IN 'SERVICE BUILD INFO' , 'USID INFO' AND 'EXECUTE ORDERS' MODULES.
+<html><font color=blue size=2><b>5.33 : update column header sequence as align with column values. 
+<html><font color=blue size=2><b>5.32 : Add the Customer information of the order in the utility which should include the ICO1 and Name of the Contracting Party and the End User. 
+<html><font color=blue size=2><b>5.31 : ADDED JSON format check service in EaRRach Module. 
+<html><font color=blue size=2><b>5.30 : ADDED NEW FEATURE TO GET SERVICE BUILD INFO(USID INFO) BASED ON ADDRESS_ID,CORE_SITE_ID,SITECODE AND QUOTENUMBER. 
+<html><font color=blue size=2><b>5.20 : ADDED ICO AND SERVICE IN Order Hierarchy  MODULE. 
+<html><font color=blue size=2><b>5.19 : ADDED Order Hierarchy  MODULE. 
+<html><font color=blue size=2><b>5.17 : SKIP MILESTONE CHECK FOR ORDER STATUS CLOSED. 
+<html><font color=blue size=2><b>5.16 : Update IOVOfferStatus as per new request. 
+<html><font color=blue size=2><b>5.15 : Auto Update feature enhancement. 
+<html><font color=blue size=2><b>5.14 : Update DEDUP Utility to get the Product / service with Order. 
+<html><font color=blue size=2><b>5.13 : Update Earrach Module. 
+<html><font color=blue size=2><b>5.11 : Add Memory Usage Panel. 
+<html><font color=blue size=2><b>5.10 : ADD seperate generic panel for connections. 
+<html><font color=blue size=2><b>5.09 : New Version includes :Add  validations for "Pending_active","Manage","Migration - Soft Cut (Parallel)" & "Pending_active","Manage","Migration - Premium Cut (Parallel)"
+<html><font color=blue size=2><b>5.08 : New Version includes :Error in Acceptence spell. Please remove the file 'IOVOfferStatus.csv' from you local directory and restart the application.
+<html><font color=blue size=2><b>5.05 : Add New feature Memory Usages Indicator.
+<html><font color=blue size=2><b>5.04 : Add New feature for Order Hierarchy.
+<html><font color=blue size=2><b>5.03 : Update DEDUP checks with Order on Earrach Migrated Services.
+<html><font color=blue size=2><b>5.02 : New Version includes :Person Update Feature Enhancement.
