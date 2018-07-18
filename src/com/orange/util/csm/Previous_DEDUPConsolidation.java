@@ -639,7 +639,7 @@ public class Previous_DEDUPConsolidation
 								// IF CORE IDS MATCH
 								if(mapRow[3].equals(queryresult[1]) && mapRow[10].equals(queryresult[8]))
 								{
-									//if(X == 0)
+								
 									if(mapRow[22].equals(queryresult[20]))
 									{
 										updatedQueryResult[0] =mapRow[0];
