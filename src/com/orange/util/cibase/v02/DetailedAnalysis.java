@@ -322,12 +322,12 @@ public class DetailedAnalysis
             * GET THE EXIST USID
             * 
              */
-            String baseValue                    	= row[CiBaseConstants.existingValue_inFile];
-            String targetValue                  	= row[CiBaseConstants.targetValue_inFile];
-            String quoteValue 						= row[CiBaseConstants.quoteindexinfile];
-            String serviceValue                	= row[CiBaseConstants.serviceNameIndex_inFile];
-            String ensUserICOValue              = row[CiBaseConstants.endUserICOIndex_inFile];
-            String contractingPartyICOValue = row[CiBaseConstants.contractingPartyICOIndex_inFile];
+            String baseValue                    		= row[CiBaseConstants.existingValue_inFile];
+            String targetValue                  		= row[CiBaseConstants.targetValue_inFile];
+            String quoteValue 							= row[CiBaseConstants.quoteindexinfile];
+            String serviceValue                		= row[CiBaseConstants.serviceNameIndex_inFile];
+            String ensUserICOValue              	= row[CiBaseConstants.endUserICOIndex_inFile];
+            String contractingPartyICOValue 	= row[CiBaseConstants.contractingPartyICOIndex_inFile];
             
          
             
@@ -335,7 +335,7 @@ public class DetailedAnalysis
             ArrayList<String[]> goldTargetDetails 				= new ArrayList<String[]>();
             ArrayList<String[]> csiExistingDetails 				= new ArrayList<String[]>();
             ArrayList<String[]> csiTargetDetails 				= new ArrayList<String[]>();
-            ArrayList<String[]> archivalExistingDetails 		= new ArrayList<String[]>();
+            ArrayList<String[]> archivalExistingDetails 	= new ArrayList<String[]>();
             ArrayList<String[]> archivalTargetDetails 		= new ArrayList<String[]>();
             
            
@@ -406,11 +406,12 @@ public class DetailedAnalysis
             orderNTypeMap					= new LinkedHashMap<String, ArrayList<String>>();
             targetOrderNTypeMap 		= new LinkedHashMap<String, ArrayList<String>>();
             
-          
+        	
 	            /*
 	             * GOLD CHECKS
 	             */
 	            subDataTableBuilder = getTableData(quoteValue,"GOLD",baseValue,  goldExisitingDetails,subDataTableBuilder,true,false);
+	         
 	            subDataTableBuilder = getTableData(quoteValue,"GOLD",targetValue,goldTargetDetails,subDataTableBuilder,false,true);
 	            /*
 	             * CSI CHECKS
@@ -422,7 +423,17 @@ public class DetailedAnalysis
 	             */
 	            subDataTableBuilder = getTableData(quoteValue,"ARCHIVE",baseValue,goldExistingDetailsForArchive,subDataTableBuilder,false,false);
 	            subDataTableBuilder = getTableData(quoteValue,"ARCHIVE",targetValue,goldTargetDetailsForArchive,subDataTableBuilder,false,true);
-           
+             
+	            /*
+	             * if given order in this file is not available in the list of data extract of GOLD or ARCHIVE. 
+	             * below validation should appear.
+	             */
+	            boolean isOrderAvailable = isListedOrderAvailable(quoteValue,baseValue,imadaqv02ViewComponent);
+	            if(!isOrderAvailable)
+	            {
+	            oldUSIDEmptyMap.put("Order "+quoteValue+" not found in GOLD/Archival",null);
+	            }
+	            isOrderAvailable = false;
             
             subDataTableBuilder.append("\n</TABLE>\n");
             mainTableBuilder.append(subDataTableBuilder.toString()+"\n</TD>");
@@ -441,14 +452,14 @@ public class DetailedAnalysis
             
             subDataTableBuilder.append("\n<TR><TD>END USER ICO</TD><TD>CONTRACTING PARTY ICO</TD><TD>SITE</TD><TD>SERVICE</TD><TD>OVERALL</TD></TR>");
             
-            LinkedHashSet<String> endUserICOData                  = getConsolidateData(ensUserICOValue,3,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
+            LinkedHashSet<String> endUserICOData                  	= getConsolidateData(ensUserICOValue,3,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             LinkedHashSet<String> contrattingPartyICOData   	= getConsolidateData(contractingPartyICOValue,4,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
-            LinkedHashSet<String> siteData                             = getConsolidateData("",5,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
+            LinkedHashSet<String> siteData                             		= getConsolidateData("",5,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             LinkedHashSet<String> analysisQuotesData       		= getConsolidateData("",0,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             
             
             //LinkedHashSet<String> serviceData                    	= getConsolidateData(serviceValue,6,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
-            LinkedHashSet<String> serviceData                    	= getConsolidateData("",6,null,null,csiExistingDetails,csiTargetDetails,null,null);
+            LinkedHashSet<String> serviceData                    		= getConsolidateData("",6,null,null,csiExistingDetails,csiTargetDetails,null,null);
             
            
             serviceData = syncService(serviceData);
@@ -611,7 +622,8 @@ public class DetailedAnalysis
             return isAnyFailed;
       }
       private StringBuilder getTableData(String quote,String source,String sourcevalue,ArrayList<String[]> data,StringBuilder builder,boolean isHeaderRequired, boolean isTargetUSIDCheck){
-            
+    	  
+    	  	
             if(isHeaderRequired)
             {
                   // ADD TABLE HEADER 
@@ -634,11 +646,7 @@ public class DetailedAnalysis
                   oldUSIDEmptyMap.put("Old USID is not correct or is Empty.",null);
             }
             
-         
-            
-            boolean isOrderAvailable= false;
-        
-            for(int row = 0; row<data.size();row++)
+           for(int row = 0; row<data.size();row++)
             {
                   builder.append("\n<TR><TD>"+source+"</TD><TD>"+sourcevalue+"</TD>");
                   int count = 0;
@@ -647,16 +655,9 @@ public class DetailedAnalysis
                         if(!isTargetUSIDCheck && count==0)
                         {
                               /*
-                              * TO HEIGHLIGHT IMPACTED ORDERS ORANGE AND BOLD.
+                              * TO HEIGHLIGHT IMPACTED ORDERS GRAY AND BOLD.
                               */
                               builder.append("\n<TD><b><font color='#2F4F4F'>"+datarow+"</font></b></TD>\n");
-                              if(datarow.equals(quote))
-                              {
-                            	  /*
-                            	   * to check whether given order in this file is available in the list of data extract or not
-                            	   */
-                            	  isOrderAvailable = true;
-                              }
                         }
                         else
                         {
@@ -679,19 +680,11 @@ public class DetailedAnalysis
                   }
                   
                   builder.append("\n</TR>");
+                 
             }
         
-            /*
-             * if given order in this file is not available in the list of data extract of GOLD or ARCHIVE. 
-             * below validation should appear.
-             */
-        if(!isTargetUSIDCheck && (source.equalsIgnoreCase("GOLD") || source.equalsIgnoreCase("ARCHIVE")))
-            {
-        	if(!isOrderAvailable)
-        	{
-                oldUSIDEmptyMap.put("Order not found in GOLD/Archival",null);
-        	}
-          }
+           
+      
             
             return builder;
       }
@@ -939,5 +932,48 @@ private void addValueInTargetOrderTypeMap(String key,String value){
     	  return results;
       }
       
+      private boolean isListedOrderAvailable(String quote,String existingUSID,Imadaqv02ViewComponent imadaqv02ViewComponent) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException
+      {
+    	 boolean isOrderAvailabe = false;
+    	 
+    	 
+    	 String GOLDLQL="SELECT DISTINCT QUOTE.QUOTENUMBER FROM "+
+            ConnectionBean.getDbPrefix()+"SC_QUOTE QUOTE   ,"+
+            ConnectionBean.getDbPrefix()+"SC_QUOTE_LINE_ITEM ATTR_LINEITEM " +
+            " WHERE"+  
+            " QUOTE.TRIL_GID = ATTR_LINEITEM.QUOTE  "+
+            " AND (ATTR_LINEITEM.NEW_CONFIG     = ? " +
+            " OR  ATTR_LINEITEM.EXIST_CONFIG    = ? "+
+            " OR  ATTR_LINEITEM.VALUE                 = ? )"+
+            " AND QUOTE.QUOTENUMBER =?";
+          
+    	 
+    	  String ARCHIVAL_LQL ="SELECT DISTINCT LINEITEM.ORDERNUMBER FROM " +
+                  ConnectionBeanArchived.getDbPrefix()+"SC_QUOTE_LINE_ITEM_A LINEITEM " +
+                  "WHERE " +
+                  " (LINEITEM.NEW_CONFIG        = ? " +
+                  " OR  LINEITEM.EXIST_CONFIG = ? "+
+                  " OR  LINEITEM.VALUE          = ? )" +
+                  " AND LINEITEM. ORDERNUMBER=?";
+    	  
+    	  ArrayList<String[]> goldExisitingDetails  		   =CommonUtils.getQueryResult(GOLDLQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote);
+    	  
+    	  if(null != goldExisitingDetails && goldExisitingDetails.size()>0)
+    	  {
+    		  isOrderAvailabe = true;
+    		  return isOrderAvailabe;
+    	  }
+    	  else
+    	  {
+    		  ArrayList<String[]> archiveExisitingDetails  		=CommonUtils.getArchiveQueryResult(ARCHIVAL_LQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote); 
+    	     if(null != archiveExisitingDetails && archiveExisitingDetails.size()>0)
+    	     {
+	    	     isOrderAvailabe = true;
+	       		  return isOrderAvailabe; 
+    	     }
+    	  }
+    	 return isOrderAvailabe;
+    	 
+      }
 }
 

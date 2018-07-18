@@ -2367,27 +2367,29 @@ private class MyWindowAdapter extends WindowAdapter{
 		
 		String ftpUserName 				= FTPSettings.getFtpUser();
 		String ftpUserPassword 			= FTPSettings.getFtpPassword();
-		String ftpURL 						= FTPSettings.getFtpURL();
+		String ftpURL 							= FTPSettings.getFtpURL();
 		
 		File F = new File(Directories.customUserLOGSFile);
 		FileInputStream fstream = new FileInputStream(F);
 		BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
 		String strLine;
-		String data="";
+		StringBuilder data= new StringBuilder();
 		while ((strLine = br.readLine()) != null)   
 		{
-			data+= strLine;
+			data.append(strLine+"\n");
 		}
 		br.close();
 		fstream.close();
+		
 		if(null != data && data.length()>1)
 		{
-			ByteArrayInputStream local = new ByteArrayInputStream(data.getBytes());
+			ByteArrayInputStream local = new ByteArrayInputStream(data.toString().getBytes());
 			FTPClient ftpClientLoader = new FTPDownloader(ftpURL, ftpUserName, ftpUserPassword).getFTPClient();
 			ftpClientLoader.appendFile(FTPSettings.getDBftpFileLocation()+"appLogs.txt",local);
 			local.close();
+			F.delete();
 		}
-		F.delete();
+		
 	}
 	public void callMain()
 	{
@@ -2592,7 +2594,9 @@ private class MyWindowAdapter extends WindowAdapter{
 				 }catch(Exception e){CommonUtils.showExceptionStack(e);}
 				 try
 				 {
-					 M.uploadLogs();
+					System.out.println(" UPDATING lOGS DETAILS ON REMOTE SERVER...."); 
+					M.uploadLogs();
+					System.out.println("LOGS DETAILS LOADS SUCCESSFULLY...."); 
 				  	M.loadDataBaseProp();
 			 	  }catch(Exception e){CommonUtils.showExceptionStack(e);}
 				

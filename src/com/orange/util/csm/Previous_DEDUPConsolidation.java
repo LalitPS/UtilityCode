@@ -557,6 +557,7 @@ public class Previous_DEDUPConsolidation
 						"left outer join "+ConnectionBean.getDbPrefix()+"sc_quote quote on site.tril_gid=quote.site OR site.tril_gid=quote.hotcutnewsite "+
 						"where site.address_id in(?) " +
 						"and (organ.OrganizationID <> '683512' " +
+						
 						// ADD
 						// The below section added to get only those data which has Orders
 						// In any case the original row should not be missed 
@@ -629,13 +630,17 @@ public class Previous_DEDUPConsolidation
 			    		exisitingMapValues.remove(mapRow);
 			    		for(int X = 0 ; X< queryResults.size(); X++)
 							{
-								
+								/*
+								 * in query result sitecode index is 20th
+								 * in file sitecode index is 22nd 
+								 */
 			    				String queryresult[] = queryResults.get(X);
 								String[] updatedQueryResult = new String[queryresult.length+2];
 								// IF CORE IDS MATCH
 								if(mapRow[3].equals(queryresult[1]) && mapRow[10].equals(queryresult[8]))
 								{
-									if(X == 0)
+									//if(X == 0)
+									if(mapRow[22].equals(queryresult[20]))
 									{
 										updatedQueryResult[0] =mapRow[0];
 										updatedQueryResult[1] =mapRow[1];
