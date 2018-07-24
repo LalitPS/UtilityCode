@@ -218,7 +218,7 @@ public class CommonUtils {
 	
 	static Logger logger = initLogger();
 	
-	public static String version="8.09";
+	public static String version="8.10";
 	/*@ LALIT
 	 * Force Update value can be META ,PATCH OR HOLD
 	 * 

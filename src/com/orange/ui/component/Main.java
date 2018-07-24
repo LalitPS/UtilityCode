@@ -1590,7 +1590,8 @@ private class MyWindowAdapter extends WindowAdapter{
 			new Thread(new Runnable(){public void run(){try{
 		
 					PackageData PD = new PackageData(basePath);
-					PD.packageFileData(basePath);
+					PD.packageFileForMigratedReportsData(basePath);
+					PD.packageFileForImpactedReportsData(basePath);
 					TreeFormation.setTreeFormation(basePath, sp);
 				
 					pwin.dispose();
@@ -2580,7 +2581,6 @@ private class MyWindowAdapter extends WindowAdapter{
 		return loader;
 	}
 	
-
 	public static void main(String args[]){
 		Main M = new Main();
 		if(null == args || args.length==0)
@@ -2594,9 +2594,9 @@ private class MyWindowAdapter extends WindowAdapter{
 				 }catch(Exception e){CommonUtils.showExceptionStack(e);}
 				 try
 				 {
-					System.out.println(" UPDATING lOGS DETAILS ON REMOTE SERVER...."); 
+					System.out.println("Updating log details on remote server....Please wait.."); 
 					M.uploadLogs();
-					System.out.println("LOGS DETAILS LOADS SUCCESSFULLY...."); 
+					System.out.println("Log details uploded successfully...."); 
 				  	M.loadDataBaseProp();
 			 	  }catch(Exception e){CommonUtils.showExceptionStack(e);}
 				

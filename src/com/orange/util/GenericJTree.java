@@ -51,6 +51,7 @@ public class GenericJTree extends JTree {
 	  
 	public GenericJTree(DefaultTreeModel dtModel){
 		  super(dtModel);
+		 // setDragEnabled(true);
 		  /*
 		   * UNCOMMNET BELOW 2 LINES FOR DRAG AND DROP SUPPORT
 		   * 

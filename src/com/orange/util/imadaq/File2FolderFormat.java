@@ -48,8 +48,7 @@ public class File2FolderFormat {
 			if (".csv".equals(newfileext)) {
 				try {
 					Integer.parseInt(number);
-					File dir = new File(dirlocation + "\\"
-							+ Constants.directoryPrefix + number);
+					File dir = new File(dirlocation +File.separator+ Constants.directoryPrefix + number);
 
 					/*
 					 * Stop sub folder creation for _Left_<number>.csv file.
@@ -59,25 +58,12 @@ public class File2FolderFormat {
 					 * file(s) file. while refreshing or load Tree..
 					 */
 				
-					if (!fileName.contains(Constants.exemptLeftFileFolder)
-							&& !fileName.contains(Constants.packageFilesPrefix)) {
-						if (!dir.exists()) {
-
+					if (!fileName.contains(Constants.exemptLeftFileFolder)&& !fileName.contains(Constants.packageMigratedFilesPrefix)&& !fileName.contains(Constants.packageImpactedFilesPrefix)) {
+						if (!dir.exists()) 
+						{
 							dir.mkdir();
-							LOGGER.info(" Dir created " + dir.getAbsolutePath());
-							copyFile(dirlocation + "\\" + fileName, dirlocation
-									+ "\\" + Constants.directoryPrefix + number
-									+ "\\" + newfilename + newfileext);
-							LOGGER.info(" File name " + dirlocation + "\\"
-									+ fileName + "   Change to " + dirlocation
-									+ "\\" + Constants.directoryPrefix + number
-									+ "\\" + newfilename + newfileext);
-
-						} else {
-							LOGGER.warning(" Dir " + dirlocation + "\\"
-									+ Constants.directoryPrefix + number
-									+ " Exists.. Hence Ignore..");
-						}
+							copyFile(dirlocation + File.separator + fileName, dirlocation	+ File.separator  + Constants.directoryPrefix + number	+ File.separator  + newfilename + newfileext);
+						} 
 					}
 
 				} catch (NumberFormatException nfe) {

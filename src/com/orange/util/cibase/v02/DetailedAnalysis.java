@@ -34,9 +34,9 @@ public class DetailedAnalysis
       private Map<String, ArrayList<String>> orderNUSIDMapForMigratedService;
       private Map<String, ArrayList<String>> orderNTypeMap;
       private Map<String, ArrayList<String>> targetOrderNTypeMap;
-      private int ROWNUM                 =CommonUtils.getMaxRecords();
-      private String PASS_TEXT   		="<font color='#FF8C00'>LALIT_PASS</font>";
-      private String FAILED_TEXT 	="<font color='#FF8C00'>LALIT_FAILED</font>";
+      private int ROWNUM                	 =CommonUtils.getMaxRecords();
+      private String PASS_TEXT   		="<font color='#FF8C00'>OVERALL_PASS</font>";
+      private String FAILED_TEXT 		="<font color='#FF8C00'>OVERALL_FAILED</font>";
       private Map<String,ArrayList<String>> impactedOrderReportUpdateWithServiceErrorsMap;
       private Map<String,ArrayList<String>> impactedOrderReportUpdateWithSiteErrorsMap;
      
@@ -44,6 +44,7 @@ public class DetailedAnalysis
       
       private int orderOnMSCount=0;
      
+      
             
       private String GOLDSQL = "SELECT DISTINCT QUOTE.QUOTENUMBER,"
             +CommonUtils.ORDER_TYPE_DECODE
@@ -51,6 +52,7 @@ public class DetailedAnalysis
             " ORG1.ORGANIZATIONID AS END_USER_ICO,ORG2.ORGANIZATIONID AS CONTRACTING_PARTY_ICO,"+
             " SITE.SITECODE, "+
             " CASE WHEN SERVICE.DISP_NAME <> 'NULL' THEN SERVICE.DISP_NAME  ELSE QUOTE.SERVICENAME END AS QUOTE_EXISITING_SERVICE "+
+          
             " FROM "+
             ConnectionBean.getDbPrefix()+"SC_QUOTE QUOTE   "+
             "LEFT JOIN "+ConnectionBean.getDbPrefix()+"EQ_SERVICE SERVICE ON (QUOTE.MIGRATIONSERVICE = SERVICE.SERVICE_ID) ,"+
@@ -74,8 +76,9 @@ public class DetailedAnalysis
             " ORDER BY QUOTE.QUOTENUMBER";
       
       private String CSISQL=
-    		"SELECT DISTINCT A.V_ORDHANDLE,A.V_ORDERTYPE ,'NA' AS TYPE,  A.V_ENDUSERHANDLE ,A.V_CUSTHANDLE , A.V_SITEHANDLE,A.V_SERVICEHANDLE "+
+    		" SELECT DISTINCT A.V_ORDHANDLE,A.V_ORDERTYPE ,'NA' AS TYPE,  A.V_ENDUSERHANDLE ,A.V_CUSTHANDLE , A.V_SITEHANDLE,A.V_SERVICEHANDLE "+
     		" FROM (SELECT V_ORDHANDLE,V_ORDERTYPE ,  V_ENDUSERHANDLE ,V_CUSTHANDLE , V_SITEHANDLE,V_SERVICEHANDLE "+
+    	
   			" FROM "+ ConnectionBeanCSI.getDbPrefix()+"VIW_VERSION_ELEMENT_ATTRIBUTE V WHERE SE_USID = ? "+
   			" UNION "+
   			" SELECT V_ORDHANDLE,V_ORDERTYPE ,  V_ENDUSERHANDLE ,V_CUSTHANDLE , V_SITEHANDLE,V_SERVICEHANDLE "+
@@ -115,6 +118,7 @@ public class DetailedAnalysis
             " ORG1.ORGANIZATIONID AS END_USER_ICO,ORG2.ORGANIZATIONID AS CONTRACTING_PARTY_ICO,"+
             " SITE.SITECODE, "+
             " CASE WHEN SERVICE.DISP_NAME <> 'NULL' THEN SERVICE.DISP_NAME  ELSE QUOTE.SERVICENAME END AS QUOTE_EXISITING_SERVICE "+
+        
            // " CASE WHEN QUOTE.MIGRATIONSERVICENAME <> 'NULL' THEN QUOTE.MIGRATIONSERVICENAME  ELSE QUOTE.SERVICENAME END AS QUOTE_EXISITING_SERVICE "+
             " FROM "+
             ConnectionBean.getDbPrefix()+"SC_QUOTE QUOTE  "+
@@ -314,7 +318,7 @@ public class DetailedAnalysis
       }
       
       private void getAnalysisProcess(String[] row, StringBuilder mainTableBuilder,Imadaqv02ViewComponent imadaqv02ViewComponent,ArrayList<String[]> writerRows,String baseFileName) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException{
-          
+    	  	
             boolean isMoreThenRownum = false;
            
             /*
@@ -424,17 +428,7 @@ public class DetailedAnalysis
 	            subDataTableBuilder = getTableData(quoteValue,"ARCHIVE",baseValue,goldExistingDetailsForArchive,subDataTableBuilder,false,false);
 	            subDataTableBuilder = getTableData(quoteValue,"ARCHIVE",targetValue,goldTargetDetailsForArchive,subDataTableBuilder,false,true);
              
-	            /*
-	             * if given order in this file is not available in the list of data extract of GOLD or ARCHIVE. 
-	             * below validation should appear.
-	             */
-	            boolean isOrderAvailable = isListedOrderAvailable(quoteValue,baseValue,imadaqv02ViewComponent);
-	            if(!isOrderAvailable)
-	            {
-	            oldUSIDEmptyMap.put("Order "+quoteValue+" not found in GOLD/Archival",null);
-	            }
-	            isOrderAvailable = false;
-            
+	          
             subDataTableBuilder.append("\n</TABLE>\n");
             mainTableBuilder.append(subDataTableBuilder.toString()+"\n</TD>");
             subDataTableBuilder = null;
@@ -457,12 +451,11 @@ public class DetailedAnalysis
             LinkedHashSet<String> siteData                             		= getConsolidateData("",5,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             LinkedHashSet<String> analysisQuotesData       		= getConsolidateData("",0,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             
-            
             //LinkedHashSet<String> serviceData                    	= getConsolidateData(serviceValue,6,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             LinkedHashSet<String> serviceData                    		= getConsolidateData("",6,null,null,csiExistingDetails,csiTargetDetails,null,null);
             
            
-            serviceData = syncService(serviceData);
+            serviceData = USIDValidations.syncService(serviceData);
             ArrayList<String> ar = new ArrayList<String>();
             ar.addAll(serviceData);
             
@@ -472,33 +465,14 @@ public class DetailedAnalysis
              */
             if(ar.size()>1)
             {
-            	/*
-                 * get the services details from CSI only for TU only
-                 * 
-                 */
-            	
-            	//serviceData                    	= getConsolidateData("",6,null,null,null,csiTargetDetails,null,null);
-            	//serviceData = syncService(serviceData);
-                //ar = new ArrayList<String>();
-                //ar.addAll(serviceData);
-               /*
-                * if multiple services found in CSI for TU
-                */
-               // if(ar.size()>1)
-               // {
-            	     serviceData.add("<FONT COLOR='BLUE'>Target USID already exists in CSI with another product.</FONT>");
+            	    // serviceData.add("<FONT COLOR='BLUE'>Target USID already exists in CSI with another product.</FONT>");
                 	 addValueInMap(impactedOrderReportUpdateWithServiceErrorsMap,baseValue,ar);
-               // }
-               // else
-               // {
-               // 	ar = new ArrayList<String>();
-              //  }
             }
           
             
             
             
-            siteData = syncService(siteData);
+            siteData = USIDValidations.syncService(siteData);
             ArrayList<String> sitear = new ArrayList<String>();
             sitear.addAll(siteData);
             addValueInMap(impactedOrderReportUpdateWithSiteErrorsMap,baseValue,sitear);
@@ -506,32 +480,33 @@ public class DetailedAnalysis
             subDataTableBuilder.append("\n<TR>");
             boolean isAnyFailed = false;
             
-            isAnyFailed = checkUniquness(isAnyFailed,subDataTableBuilder,endUserICOData);
-            isAnyFailed = checkUniquness(isAnyFailed,subDataTableBuilder,contrattingPartyICOData);
-            isAnyFailed = checkUniquness(isAnyFailed,subDataTableBuilder,siteData);
-            isAnyFailed = checkUniquness(isAnyFailed,subDataTableBuilder,serviceData);
-            
-      
+            isAnyFailed 							= checkUniquness(isAnyFailed,subDataTableBuilder,endUserICOData);
+            isAnyFailed 							= checkUniquness(isAnyFailed,subDataTableBuilder,contrattingPartyICOData);
+            isAnyFailed 							= checkUniquness(isAnyFailed,subDataTableBuilder,siteData);
+            isAnyFailed 							= checkUniquness(isAnyFailed,subDataTableBuilder,serviceData);
+        
             if(!isAnyFailed)
             {
                   subDataTableBuilder.append("\n<TD>"+PASS_TEXT+"</TD>");
-                  
             }
             else
             {
                   subDataTableBuilder.append("\n<TD>"+FAILED_TEXT+"</TD>");
-                  
             }
             
             
             subDataTableBuilder.append("\n</TR>");
             
             USIDValidations usidValidations = new USIDValidations();
-            isAnyFailed = usidValidations.getUSIDValidation1(orderNUSIDMap, subDataTableBuilder, isAnyFailed);
-            isAnyFailed = usidValidations.getUSIDValidation2(orderNTypeMap, subDataTableBuilder, isAnyFailed);
-            isAnyFailed = usidValidations.getUSIDValidation3(targetOrderNTypeMap, subDataTableBuilder, isAnyFailed, analysisQuotesData, imadaqv02ViewComponent);
-
-            
+             							 usidValidations.getUSIDValidation1(orderNUSIDMap, subDataTableBuilder);
+             							 usidValidations.getUSIDValidation2(orderNTypeMap, subDataTableBuilder);
+             							 usidValidations.getUSIDValidation3(targetOrderNTypeMap, subDataTableBuilder, analysisQuotesData, imadaqv02ViewComponent);
+             							 usidValidations.getUSIDValidation4(serviceData, subDataTableBuilder);
+             		                     usidValidations.isListedOrderAvailable(quoteValue,baseValue,imadaqv02ViewComponent,subDataTableBuilder);
+             		                     usidValidations.isSameServiceElementClass(baseValue,targetValue,imadaqv02ViewComponent,subDataTableBuilder);
+                  
+           isAnyFailed = usidValidations.isAnyFailed();
+         
             /*
             * --------------
             * GEBERIC-COMMON CHECKS
@@ -564,9 +539,9 @@ public class DetailedAnalysis
             entries = null;
             targetUSIDEmptyMap = null;    
             
-            
             String S = subDataTableBuilder.toString();
             
+         
             if(isAnyFailed)
             {
             	 TOTAL_FAILED ++;
@@ -579,6 +554,7 @@ public class DetailedAnalysis
             	 TOTAL_PASS ++;
                   writerRows.add(addInRow(row,CiBaseConstants.GOLDPassFilterMatch));
                   S = S.replace(PASS_TEXT, "<FONT COLOR='#FF8C00'>"+CiBaseConstants.GOLDPassFilterMatch+"</FONT>");
+                  S = S.replace(FAILED_TEXT, "<FONT COLOR='#FF8C00'>"+CiBaseConstants.GOLDPassFilterMatch+"</FONT>");
             }
             S = S+"\n</TABLE>\n";
          
@@ -621,6 +597,7 @@ public class DetailedAnalysis
             }
             return isAnyFailed;
       }
+      
       private StringBuilder getTableData(String quote,String source,String sourcevalue,ArrayList<String[]> data,StringBuilder builder,boolean isHeaderRequired, boolean isTargetUSIDCheck){
     	  
     	  	
@@ -778,33 +755,8 @@ private void addValueInTargetOrderTypeMap(String key,String value){
       return set;
       }
      
-	 /*
-	  * 
-	  * SERVICE CHECK :
-	  * 
-	  * SERVICE COMBINATIONS PASS CASES
-	  * IP/VPN & IP_VPN
-	  * 
-	  */
-     private LinkedHashSet<String> syncService(LinkedHashSet<String> servcie)
-     {
-    	 LinkedHashSet<String> syncServiceSet = new LinkedHashSet<String>();
-    	 
-    	 Iterator<String> itr = servcie.iterator();
-         while(itr.hasNext())
-         {
-             String syncService = itr.next();
-         	 if(null != syncService && syncService.length()>0)
-	    	 {
-	    		   if(syncService.equalsIgnoreCase("IP_VPN"))
-		    	   {
-		    		   syncService = syncService.replace("IP_VPN","IP/VPN");
-		    	   }
-	    	 }
-         	syncServiceSet.add(syncService);
-         }
-    	 return syncServiceSet;
-     }
+	
+    
       
       private String[] addInRow(String[] row, String newData)
       {
@@ -932,48 +884,6 @@ private void addValueInTargetOrderTypeMap(String key,String value){
     	  return results;
       }
       
-      private boolean isListedOrderAvailable(String quote,String existingUSID,Imadaqv02ViewComponent imadaqv02ViewComponent) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException
-      {
-    	 boolean isOrderAvailabe = false;
-    	 
-    	 
-    	 String GOLDLQL="SELECT DISTINCT QUOTE.QUOTENUMBER FROM "+
-            ConnectionBean.getDbPrefix()+"SC_QUOTE QUOTE   ,"+
-            ConnectionBean.getDbPrefix()+"SC_QUOTE_LINE_ITEM ATTR_LINEITEM " +
-            " WHERE"+  
-            " QUOTE.TRIL_GID = ATTR_LINEITEM.QUOTE  "+
-            " AND (ATTR_LINEITEM.NEW_CONFIG     = ? " +
-            " OR  ATTR_LINEITEM.EXIST_CONFIG    = ? "+
-            " OR  ATTR_LINEITEM.VALUE                 = ? )"+
-            " AND QUOTE.QUOTENUMBER =?";
-          
-    	 
-    	  String ARCHIVAL_LQL ="SELECT DISTINCT LINEITEM.ORDERNUMBER FROM " +
-                  ConnectionBeanArchived.getDbPrefix()+"SC_QUOTE_LINE_ITEM_A LINEITEM " +
-                  "WHERE " +
-                  " (LINEITEM.NEW_CONFIG        = ? " +
-                  " OR  LINEITEM.EXIST_CONFIG = ? "+
-                  " OR  LINEITEM.VALUE          = ? )" +
-                  " AND LINEITEM. ORDERNUMBER=?";
-    	  
-    	  ArrayList<String[]> goldExisitingDetails  		   =CommonUtils.getQueryResult(GOLDLQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote);
-    	  
-    	  if(null != goldExisitingDetails && goldExisitingDetails.size()>0)
-    	  {
-    		  isOrderAvailabe = true;
-    		  return isOrderAvailabe;
-    	  }
-    	  else
-    	  {
-    		  ArrayList<String[]> archiveExisitingDetails  		=CommonUtils.getArchiveQueryResult(ARCHIVAL_LQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote); 
-    	     if(null != archiveExisitingDetails && archiveExisitingDetails.size()>0)
-    	     {
-	    	     isOrderAvailabe = true;
-	       		  return isOrderAvailabe; 
-    	     }
-    	  }
-    	 return isOrderAvailabe;
-    	 
-      }
+     
 }
 
