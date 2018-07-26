@@ -313,57 +313,64 @@ public class USIDValidations {
        * if given order in this file is not available in the list of data extract of GOLD or ARCHIVE. 
        * below validation should appear.
        */
-      public  void  isListedOrderAvailable(String quote,String existingUSID,Imadaqv02ViewComponent imadaqv02ViewComponent,StringBuilder subDataTableBuilder) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException
+      public  void  isListedOrderAvailable(String quote,String existingUSID,String targetUSID,Imadaqv02ViewComponent imadaqv02ViewComponent,StringBuilder subDataTableBuilder) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException
       {
-    	  
-    	
-    	  boolean isOrderAvailabe = false;
-    	 
-    	 
-    	 String GOLDLQL="SELECT DISTINCT QUOTE.QUOTENUMBER FROM "+
+    	  	String GOLDLQL="SELECT DISTINCT QUOTE.QUOTENUMBER FROM "+
             ConnectionBean.getDbPrefix()+"SC_QUOTE QUOTE   ,"+
             ConnectionBean.getDbPrefix()+"SC_QUOTE_LINE_ITEM ATTR_LINEITEM " +
             " WHERE"+  
             " QUOTE.TRIL_GID = ATTR_LINEITEM.QUOTE  "+
-            " AND (ATTR_LINEITEM.NEW_CONFIG     = ? " +
-            " OR  ATTR_LINEITEM.EXIST_CONFIG    = ? "+
-            " OR  ATTR_LINEITEM.VALUE                 = ? )"+
-            " AND QUOTE.QUOTENUMBER =?";
+            " AND( (ATTR_LINEITEM.NEW_CONFIG     = ?  OR  ATTR_LINEITEM.EXIST_CONFIG    = ? OR  ATTR_LINEITEM.VALUE  =? )" +
+            " OR     (ATTR_LINEITEM.NEW_CONFIG     = ?  OR  ATTR_LINEITEM.EXIST_CONFIG    = ? OR  ATTR_LINEITEM.VALUE  =? )) ";
+           // +" AND QUOTE.QUOTENUMBER =?";
           
     	 
     	  String ARCHIVAL_LQL ="SELECT DISTINCT LINEITEM.ORDERNUMBER FROM " +
                   ConnectionBeanArchived.getDbPrefix()+"SC_QUOTE_LINE_ITEM_A LINEITEM " +
                   "WHERE " +
-                  " (LINEITEM.NEW_CONFIG        = ? " +
-                  " OR  LINEITEM.EXIST_CONFIG = ? "+
-                  " OR  LINEITEM.VALUE          = ? )" +
-                  " AND LINEITEM. ORDERNUMBER=?";
+                  "      ( (LINEITEM.NEW_CONFIG        = ?  OR  LINEITEM.EXIST_CONFIG = ?  OR  LINEITEM.VALUE  = ? )"+
+                  " OR  (LINEITEM.NEW_CONFIG        = ?  OR  LINEITEM.EXIST_CONFIG = ?   OR  LINEITEM.VALUE  = ? ) )";
+                //+  " AND LINEITEM. ORDERNUMBER=?";
     	  
-    	  ArrayList<String[]> goldExisitingDetails  		   =CommonUtils.getQueryResult(GOLDLQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote);
-    	
-    	  if(null != goldExisitingDetails && goldExisitingDetails.size()>0)
+    	  ArrayList<String[]> goldExisitingDetails  		   =CommonUtils.getQueryResult(GOLDLQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,targetUSID,targetUSID,targetUSID);
+    	  ArrayList<String[]> consolidatedArray = new  ArrayList<String[]> (goldExisitingDetails);
+    	  goldExisitingDetails = null;
+    	  
+    	  if(null == consolidatedArray || consolidatedArray.size()==0)
     	  {
-    		  isOrderAvailabe = true;
+    		  /*
+    		   * check quote / usid existence in archival database.
+    		   */
+    	 	  ArrayList<String[]> archiveExisitingDetails  		=CommonUtils.getArchiveQueryResult(ARCHIVAL_LQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,targetUSID,targetUSID,targetUSID); 
+    		  consolidatedArray.addAll(archiveExisitingDetails);
+    		  archiveExisitingDetails = null;
     	  }
-    	  else
+    	  
+    	  ArrayList<String> quoteList = new ArrayList<String>();
+    	  for(String arr[] : consolidatedArray)
     	  {
-    		  ArrayList<String[]> archiveExisitingDetails  		=CommonUtils.getArchiveQueryResult(ARCHIVAL_LQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote); 
-    	
-    	
-    		  if(null != archiveExisitingDetails && archiveExisitingDetails.size()>0)
-    	     {
-	    	      isOrderAvailabe = true;
-		     }
+    		  quoteList.add(arr[0]);
     	  }
-    	
-    	  if(!isOrderAvailabe )
+    	  consolidatedArray = null;
+    	  
+    	  if(quoteList.size()==0)
     	  {
     		  setAnyFailed(true);
-    		  String S="Order "+quote+" not found in GOLD/Archival. OR Existing USID is not availabe on given Order.";
+    		  String S="Order "+quote+" not found in GOLD/Archival.";
               subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
     	  }
+    	  /*
+    	   * Here we are not setting setAnayFailed(true) , just showing warning , 
+    	   * because as per base implementation (Imadaq Usid migrator utility)  only above said error fires. 
+    	   * and does not check whether given order is in the list or not. Here in this implementation we are also covering order in list check, bit not marking this as an error.
+    	   */
     	 
-    	
+    	  else  if(!quoteList.contains(quote))
+    	  {
+    		  String S="Warning : >> Given Order "+quote+" not found in GOLD/Archival with given USIDs.";
+              subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='orange'>"+S+"</font></TD></TR>\n");
+    	  }
+    	  quoteList = null;
       }
       
       public  void isSameServiceElementClass(String existingUSID,String newUSID,Imadaqv02ViewComponent imadaqv02ViewComponent,StringBuilder subDataTableBuilder) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException

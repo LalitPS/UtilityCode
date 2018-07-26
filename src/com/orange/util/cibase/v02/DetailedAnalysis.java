@@ -344,25 +344,20 @@ public class DetailedAnalysis
             
            
                       
-		            if(imadaqv02ViewComponent.getConnetionPane().getGoldConnect().isSelected())
-		            {
+		          
 			           goldExisitingDetails  		=CommonUtils.getQueryResult(GOLDSQL,imadaqv02ViewComponent,baseValue,baseValue,baseValue);
 			           goldTargetDetails      	    =CommonUtils.getQueryResult(GOLDSQL,imadaqv02ViewComponent,targetValue,targetValue,targetValue);
-		            }
-		            
-		            if(imadaqv02ViewComponent.getConnetionPane().getCsiConnect().isSelected())
-		            {
+		           
 			            csiExistingDetails 			= CommonUtils.getCSIQueryResult(CSISQL,imadaqv02ViewComponent,baseValue,baseValue);
 			            csiTargetDetails   			= CommonUtils.getCSIQueryResult(CSISQL,imadaqv02ViewComponent,targetValue,targetValue);
-		            }
+		           
 		            /*
 		            * below query will give only orders
 		            */
-		            if(imadaqv02ViewComponent.getConnetionPane().getArchiveConnect().isSelected())
-		            {
+		           
 			            archivalExistingDetails   = CommonUtils.getArchiveQueryResult(ARCHIVAL_SQL,imadaqv02ViewComponent,baseValue,baseValue,baseValue);
 			            archivalTargetDetails     = CommonUtils.getArchiveQueryResult(ARCHIVAL_SQL,imadaqv02ViewComponent,targetValue,targetValue,targetValue);
-		            }
+		           
             
            
       
@@ -508,6 +503,12 @@ public class DetailedAnalysis
             subDataTableBuilder.append("\n</TR>");
             
             USIDValidations usidValidations = new USIDValidations();
+            
+							            /*
+										  * quote not found in GOLD or ARCHIVE. 
+										  */
+							             usidValidations.isListedOrderAvailable(quoteValue,baseValue,targetValue,imadaqv02ViewComponent,subDataTableBuilder);
+             
             							/*
             							 * Order contains both the USIDs
             							 * This check only with GOLD and Archival Data Base data
@@ -534,14 +535,7 @@ public class DetailedAnalysis
              							  */
              							 usidValidations.getUSIDValidation4(serviceData, subDataTableBuilder);
              							 
-             							 
-             							 /*
-             							  * if given order in this file is not available in the list of data extract of GOLD or ARCHIVE. 
-             							  */
-             		                     usidValidations.isListedOrderAvailable(quoteValue,baseValue,imadaqv02ViewComponent,subDataTableBuilder);
-             		                     
-             		                     
-             		                     /*
+             							  /*
              		                      * The Target USID ServiceElement belongs to different Service element categories
              		                      */
              		                     usidValidations.isSameServiceElementClass(baseValue,targetValue,imadaqv02ViewComponent,subDataTableBuilder);
@@ -894,10 +888,13 @@ private void addValueInTargetOrderTypeMap(String key,String value){
           
     	  for(String INorders : putIn999(allOrders))
     	  {
-    	  String lql = "SELECT QUOTE.QUOTENUMBER,MIS.INSTALLED_OFFER_ID AS IO ,MIS.INSTALLED_OFFER_VERSION_ID AS IOV,QUOTE.SERVICENAME ,SERVICE.DISP_NAME AS MIGRATIONSERVICENAME,  'not_on_migrated_service' as ON_MIGARATED_SERVICE ,'' as USID FROM "+ConnectionBean.getDbPrefix()+"SC_QUOTE QUOTE "+
+    	  String lql = "SELECT QUOTE.QUOTENUMBER,MIS.INSTALLED_OFFER_ID AS QUOTE_IO ,MIS.INSTALLED_OFFER_VERSION_ID AS QUOTE_IOV,QUOTE.SERVICENAME ,SERVICE.DISP_NAME AS MIGRATIONSERVICENAME,  'not_on_migrated_service' as ON_MIGARATED_SERVICE ,'' as USID "+
+    	  		 " FROM        "+ConnectionBean.getDbPrefix()+"SC_QUOTE QUOTE "+
     	  		 " LEFT JOIN "+ConnectionBean.getDbPrefix()+"EQ_SERVICE SERVICE ON (QUOTE.MIGRATIONSERVICE = SERVICE.SERVICE_ID) "+
     	  		 " LEFT JOIN "+ConnectionBean.getDbPrefix()+"SC_QUOTE_MISCELLANEOUS MIS ON (MIS.TRIL_GID = QUOTE.SC_QUOTE_MISCELLANEOUS) "+
-    	  		" WHERE QUOTENUMBER IN ("+ INorders+")"; 
+    	  		"  WHERE QUOTENUMBER IN ("+ INorders+") "+
+    	  	    "  AND (MIS.INSTALLED_OFFER_ID <> 'NULL' OR MIS.INSTALLED_OFFER_VERSION_ID <> 'NULL') "; 
+    	  
           ArrayList<String[]> result = CommonUtils.getQueryResult(lql, imadaqv02ViewComponent) ;
          
           
