@@ -451,6 +451,15 @@ public class DetailedAnalysis
             LinkedHashSet<String> siteData                             		= getConsolidateData("",5,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             LinkedHashSet<String> analysisQuotesData       		= getConsolidateData("",0,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             
+            /*
+             * SERVICE CHECK FOR CSI DATA : NOT FOR GOLD AND ARCHIVAL
+             * 
+             * THE BELOW COMMENT CHECKS SERCVICE FROM GOLD,ARCHIVAL AND CSI AS WELL SERVICE FROM INPUT FILE.
+             * (AS OF NOW THIS METOD IS COMMENTED)
+             * 
+             * INSTEAD OF COMMENT METHOD , WE CHECK ONLY SERVICES FROM CSI DATA.
+             */
+            
             //LinkedHashSet<String> serviceData                    	= getConsolidateData(serviceValue,6,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             LinkedHashSet<String> serviceData                    		= getConsolidateData("",6,null,null,csiExistingDetails,csiTargetDetails,null,null);
             
@@ -499,11 +508,42 @@ public class DetailedAnalysis
             subDataTableBuilder.append("\n</TR>");
             
             USIDValidations usidValidations = new USIDValidations();
+            							/*
+            							 * Order contains both the USIDs
+            							 * This check only with GOLD and Archival Data Base data
+            							 */
              							 usidValidations.getUSIDValidation1(orderNUSIDMap, subDataTableBuilder);
-             							 usidValidations.getUSIDValidation2(orderNTypeMap, subDataTableBuilder);
+             							 
+             							 
+             							 /*
+             							  * Existing USID exists on different new order
+             							  */
+             							 //usidValidations.getUSIDValidation2(orderNTypeMap, subDataTableBuilder);
+             							 
+             							
+             							 
+             							 /*
+             							  * Target USID is already present on different new order
+             							  * If only one new order found. : Check the Order Chain.
+             							  */
              							 usidValidations.getUSIDValidation3(targetOrderNTypeMap, subDataTableBuilder, analysisQuotesData, imadaqv02ViewComponent);
+             							
+             							 
+             							 /*
+             							  * Target USID already exists in CSI with another product.
+             							  */
              							 usidValidations.getUSIDValidation4(serviceData, subDataTableBuilder);
+             							 
+             							 
+             							 /*
+             							  * if given order in this file is not available in the list of data extract of GOLD or ARCHIVE. 
+             							  */
              		                     usidValidations.isListedOrderAvailable(quoteValue,baseValue,imadaqv02ViewComponent,subDataTableBuilder);
+             		                     
+             		                     
+             		                     /*
+             		                      * The Target USID ServiceElement belongs to different Service element categories
+             		                      */
              		                     usidValidations.isSameServiceElementClass(baseValue,targetValue,imadaqv02ViewComponent,subDataTableBuilder);
                   
           
@@ -655,7 +695,7 @@ public class DetailedAnalysis
                         count++;
                   }
                   
-                  addValueInOrderUSIDMap(data.get(row)[0],sourcevalue);
+                  addValueInOrderUSIDMap(source,data.get(row)[0],sourcevalue);
                   
                   if(null != data.get(row)[1] && data.get(row)[1].trim().equalsIgnoreCase("NEW"))
                   {
@@ -677,7 +717,7 @@ public class DetailedAnalysis
             return builder;
       }
       
-      private void addValueInOrderUSIDMap(String key,String value){
+      private void addValueInOrderUSIDMap(String source,String key,String value){
           
 		    	  if(orderNUSIDMapForMigratedService.containsKey(key))
 		          {
@@ -691,19 +731,26 @@ public class DetailedAnalysis
 		                orderNUSIDMapForMigratedService.put(key, existing);
 		          }
           
-            if(orderNUSIDMap.containsKey(key))
-            {
-                  ArrayList<String> existing = orderNUSIDMap.get(key);
-                  existing.add(value);
-                  orderNUSIDMap.put(key, existing);
-            }
-            else{
-                  ArrayList<String> existing = new ArrayList<String>();
-                  existing.add(value);
-                  orderNUSIDMap.put(key, existing);
-            }
+		    /*
+		     * PUT VALUES IN THIS MAP ONLY FOR GOLD AND ARCHIVAL : NOT CHECK FOR CSI DATA	  
+		     */
+		    	  if(source!="CSI")
+		    	  {
+			            if(orderNUSIDMap.containsKey(key))
+			            {
+			                  ArrayList<String> existing = orderNUSIDMap.get(key);
+			                  existing.add(value);
+			                  orderNUSIDMap.put(key, existing);
+			            }
+			            else{
+			                  ArrayList<String> existing = new ArrayList<String>();
+			                  existing.add(value);
+			                  orderNUSIDMap.put(key, existing);
+			            }
+		    	  }
       }
-      
+ 
+   
 private void addValueInOrderTypeMap(String key,String value){
             
             if(orderNTypeMap.containsKey(key))
