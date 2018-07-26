@@ -27,6 +27,14 @@ import com.orange.util.ConnectionBeanCSI;
 import com.orange.util.MultiLinerPanel;
 import com.orange.util.ProgressMonitorPane;
 
+/*
+ * 
+ * C:\Lalit\GoldAssigment\USID_Migrations\Wave-2 All IC01\BVPN Corporate\ICO_2222
+ * data in updateimpacted report is not in sync because map doesn not take site , service , ico details . 
+ * Map only has USUDValidations . 
+ * we need to ad site , service validations in ,ap as well .
+ */
+
 public class DetailedAnalysis 
 {
       private Map<String, ArrayList<String>> oldUSIDEmptyMap,targetUSIDEmptyMap;
@@ -37,9 +45,8 @@ public class DetailedAnalysis
       private int ROWNUM                	 =CommonUtils.getMaxRecords();
       private String PASS_TEXT   		="<font color='#FF8C00'>OVERALL_PASS</font>";
       private String FAILED_TEXT 		="<font color='#FF8C00'>OVERALL_FAILED</font>";
-      private Map<String,ArrayList<String>> impactedOrderReportUpdateWithServiceErrorsMap;
-      private Map<String,ArrayList<String>> impactedOrderReportUpdateWithSiteErrorsMap;
-     
+      
+       
       private String CSS ="<head><style type='text/css'>table.altrowstable {      font-family: verdana,arial,sans-serif;    font-size:11px;  color:#33333;     border-width: 1px;      border-color: #a9c6c9;  border-collapse: collapse;}table.altrowstable th {     border-width: 1px;      padding: 8px;      border-style: solid;    border-color: #a9c6c9;}table.altrowstable td {  border-width: 1px;  padding: 8px;     border-style: solid;    border-color:#a9c6c9;}.oddrowcolor{      background-color:#ffffff;}.evenrowcolor{  background-color:#ffffff;}</style></head>";
       
       private int orderOnMSCount=0;
@@ -149,6 +156,10 @@ public class DetailedAnalysis
             for(File F : files)
             {
             	   orderNUSIDMapForMigratedService =  new LinkedHashMap<String, ArrayList<String>>();
+            	   
+            	    Map<String,ArrayList<String>> impactedOrderReportUpdateMap  = new  LinkedHashMap<String,ArrayList<String>> () ;
+              	 	USIDValidations.setImpactedOrderReportUpdateMap(impactedOrderReportUpdateMap);
+              	 	
 
 		            String      baseFileName = F.getAbsolutePath();
 		            
@@ -185,9 +196,11 @@ public class DetailedAnalysis
                         
                         mainTableBuilder.append("\n<TR><TH>EXTRACT DATA </TH><TH>ANALYSIS</TH></TR>\n");
                         
-                        impactedOrderReportUpdateWithServiceErrorsMap = new   LinkedHashMap<String,ArrayList<String>> ();
-                        impactedOrderReportUpdateWithSiteErrorsMap    = new   LinkedHashMap<String,ArrayList<String>> ();
+                        //impactedOrderReportUpdateWithServiceErrorsMap = new   LinkedHashMap<String,ArrayList<String>> ();
+                       // impactedOrderReportUpdateWithSiteErrorsMap    = new   LinkedHashMap<String,ArrayList<String>> ();
                         
+                       
+                   	 
                         while ((row = br.readNext()) != null) 
                         {   
                                getAnalysisProcess(row,mainTableBuilder,imadaqv02ViewComponent,writerRows,baseFileName);
@@ -305,12 +318,13 @@ public class DetailedAnalysis
                          */
                         if(imadaqv02ViewComponent.getISUpdateImpactedOrderReport().isSelected())
                         {
-                        	new UpdateImpactedOrderReport(imadaqv02ViewComponent,baseFileName,impactedOrderReportUpdateWithServiceErrorsMap,impactedOrderReportUpdateWithSiteErrorsMap);
+                        	                         	 
+                        	new UpdateImpactedOrderReport(imadaqv02ViewComponent,baseFileName,USIDValidations.getImpactedOrderReportUpdateMap());
+                        	
+                        	USIDValidations.getImpactedOrderReportUpdateMap().clear();
+                        	impactedOrderReportUpdateMap = null;
                         }
-                        
-                        impactedOrderReportUpdateWithServiceErrorsMap = null;
-                        impactedOrderReportUpdateWithSiteErrorsMap = null;
-                        
+                    
                         MultiLinerPanel.getCheckBox(baseFileName).setSelected(false);  
                         MultiLinerPanel.getCheckBox(baseFileName).setForeground(Color.BLUE);  
             } // end of FOR loop     
@@ -458,29 +472,78 @@ public class DetailedAnalysis
             //LinkedHashSet<String> serviceData                    	= getConsolidateData(serviceValue,6,goldExisitingDetails,goldTargetDetails,csiExistingDetails,csiTargetDetails,goldExistingDetailsForArchive,goldTargetDetailsForArchive);
             LinkedHashSet<String> serviceData                    		= getConsolidateData("",6,null,null,csiExistingDetails,csiTargetDetails,null,null);
             
-           
+           /*
+            * SERVICE CHECK
+            */
             serviceData = USIDValidations.syncService(serviceData);
             ArrayList<String> ar = new ArrayList<String>();
             ar.addAll(serviceData);
-            
-            /*
-             * get the services details from CSI only for EU and TU
-             * 
-             */
+         
             if(ar.size()>1)
             {
-            	    // serviceData.add("<FONT COLOR='BLUE'>Target USID already exists in CSI with another product.</FONT>");
-                	 addValueInMap(impactedOrderReportUpdateWithServiceErrorsMap,baseValue,ar);
+            	StringBuilder sb = new StringBuilder(" Service Mismatch ");
+            	for(String S : ar)
+            	{
+            		sb.append(S+",");
+            	}
+            	USIDValidations.addValueInMap(baseValue, sb.toString());    
             }
           
-            
+            /*
+             * SITE CHECK
+             */
             
             
             siteData = USIDValidations.syncService(siteData);
             ArrayList<String> sitear = new ArrayList<String>();
             sitear.addAll(siteData);
-            addValueInMap(impactedOrderReportUpdateWithSiteErrorsMap,baseValue,sitear);
-           
+            
+            if(sitear.size()>1)
+            {
+	            StringBuilder sb = new StringBuilder(" Site Mismatch ");
+	        	for(String S : sitear)
+	        	{
+	        		sb.append(S+",");
+	        	}
+	        	USIDValidations.addValueInMap(baseValue, sb.toString());    
+            }
+            
+            /*
+             * END USER ICO CHECK
+             */
+            
+            endUserICOData = USIDValidations.syncService(endUserICOData);
+            ArrayList<String> enduserICOar = new ArrayList<String>();
+            enduserICOar.addAll(endUserICOData);
+            
+            if(enduserICOar.size()>1)
+            {
+	            StringBuilder sb = new StringBuilder(" End User ICO Mismatch ");
+	        	for(String S : enduserICOar)
+	        	{
+	        		sb.append(S+",");
+	        	}
+	        	USIDValidations.addValueInMap(baseValue, sb.toString());    
+            }
+            
+            /*
+             * CONTRACTING PARTY ICO CHECK
+             */
+            contrattingPartyICOData = USIDValidations.syncService(contrattingPartyICOData);
+            ArrayList<String> cpartyICOar = new ArrayList<String>();
+            cpartyICOar.addAll(contrattingPartyICOData);
+            
+            if(cpartyICOar.size()>1)
+            {
+	            StringBuilder sb = new StringBuilder(" Contracting Party ICO Mismatch ");
+	        	for(String S : cpartyICOar)
+	        	{
+	        		sb.append(S+",");
+	        	}
+	        	USIDValidations.addValueInMap(baseValue, sb.toString());    
+            }
+            
+            
             subDataTableBuilder.append("\n<TR>");
             boolean isAnyFailed = false;
             
@@ -502,7 +565,7 @@ public class DetailedAnalysis
             
             subDataTableBuilder.append("\n</TR>");
             
-            USIDValidations usidValidations = new USIDValidations();
+            							USIDValidations usidValidations = new USIDValidations();
             
 							            /*
 										  * quote not found in GOLD or ARCHIVE. 
@@ -513,13 +576,13 @@ public class DetailedAnalysis
             							 * Order contains both the USIDs
             							 * This check only with GOLD and Archival Data Base data
             							 */
-             							 usidValidations.getUSIDValidation1(orderNUSIDMap, subDataTableBuilder);
+             							 usidValidations.getUSIDValidation1(baseValue,orderNUSIDMap, subDataTableBuilder);
              							 
              							 
              							 /*
              							  * Existing USID exists on different new order
              							  */
-             							 //usidValidations.getUSIDValidation2(orderNTypeMap, subDataTableBuilder);
+             							 //usidValidations.getUSIDValidation2(baseValue,orderNTypeMap, subDataTableBuilder);
              							 
              							
              							 
@@ -527,13 +590,13 @@ public class DetailedAnalysis
              							  * Target USID is already present on different new order
              							  * If only one new order found. : Check the Order Chain.
              							  */
-             							 usidValidations.getUSIDValidation3(targetOrderNTypeMap, subDataTableBuilder, analysisQuotesData, imadaqv02ViewComponent);
+             							 usidValidations.getUSIDValidation3(baseValue,targetOrderNTypeMap, subDataTableBuilder, analysisQuotesData, imadaqv02ViewComponent);
              							
              							 
              							 /*
              							  * Target USID already exists in CSI with another product.
              							  */
-             							 usidValidations.getUSIDValidation4(serviceData, subDataTableBuilder);
+             							 usidValidations.getUSIDValidation4(baseValue,serviceData, subDataTableBuilder);
              							 
              							  /*
              		                      * The Target USID ServiceElement belongs to different Service element categories
@@ -611,19 +674,7 @@ public class DetailedAnalysis
             
       }
       
-      private void addValueInMap(Map<String,ArrayList<String>> fileReadMap,String key,ArrayList<String> value)
-  	{
-  		if(fileReadMap.containsKey(key))
-  		{
-  			ArrayList<String> values = fileReadMap.get(key);
-  			values.addAll(value);
-  			fileReadMap.put(key,values);
-  		}
-  		else
-  		{
-  				fileReadMap.put(key,value);
-  		}
-  	}
+  
       private boolean checkUniquness(boolean isAnyFailed,StringBuilder subDataTableBuilder,LinkedHashSet<String> endUserICOData){
             if(endUserICOData.size()<=1)
             {

@@ -18,7 +18,7 @@ public class UpdateImpactedOrderReport {
 	private Imadaqv02ViewComponent parentComp;
 	
 	
-	public UpdateImpactedOrderReport(Imadaqv02ViewComponent imadaqv02ViewComponent,String inputFileName,Map<String, ArrayList<String>> impactedOrderReportUpdateWithServiceErrorsMap,Map<String, ArrayList<String>> impactedOrderReportUpdateWithSiteErrorsMap) throws IOException, SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
+	public UpdateImpactedOrderReport(Imadaqv02ViewComponent imadaqv02ViewComponent,String inputFileName,Map<String,ArrayList<String>> impactedOrderReportUpdateMap) throws IOException, SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException
 	{
 		this.parentComp = imadaqv02ViewComponent;
 		
@@ -57,16 +57,11 @@ public class UpdateImpactedOrderReport {
 			   {
 				  
 				   /*
-				    * CHECK FOR FOUND MULTIPLE SERVICES.
+				    * CHECK FOR Errors.
 				    */
-				     row[4] =addErrorForMultipleServices(baseUSID,impactedOrderReportUpdateWithServiceErrorsMap);
+				     row[4] =addErrorForMultipleServices(baseUSID,impactedOrderReportUpdateMap);
 				     
-				     /*
-				      * CHECK FOR FOUND MULTIPLE SITES
-				      * 
-				      */
-				     row[4] =row[4]+"  |  "+addErrorForMutilpleSites(baseUSID,impactedOrderReportUpdateWithSiteErrorsMap);
-				     
+				   
 			   }
 			   fileUpdatedContent.add(row);
 			}
@@ -81,38 +76,25 @@ public class UpdateImpactedOrderReport {
 		fileNameToWork= null;
 	}
 	
-	private String addErrorForMultipleServices(String baseUSID,Map<String, ArrayList<String>>  impactedOrderReportUpdateWithServiceErrorsMap)
+	private String addErrorForMultipleServices(String baseUSID,Map<String, ArrayList<String>>  impactedOrderReportUpdateMap)
 	{
-		String error ="";
-		 if(impactedOrderReportUpdateWithServiceErrorsMap.containsKey(baseUSID))
+		StringBuilder Sb = new StringBuilder();
+		
+		 if(impactedOrderReportUpdateMap.containsKey(baseUSID))
 		   {
-			   
-		     ArrayList<String> values = impactedOrderReportUpdateWithServiceErrorsMap.get(baseUSID);
-		     String S ="Target USID already exists in CSI with another product. >>";
+			
+		     ArrayList<String> values = impactedOrderReportUpdateMap.get(baseUSID);
+		    int count = 1;
 		     for(String s : values)
 		     {
-		    	 S+=s+",";
+		    	 Sb.append(count+ " [ "+s+"]");
+		    	 count++;
 		     }
-		     return S;
+		    
 		   }
-		 return error;
+		 return Sb.toString();
 	}
 	
-	private String addErrorForMutilpleSites(String baseUSID,Map<String, ArrayList<String>>  impactedOrderReportUpdateWithSiteErrorsMap)
-	{
-		String error ="";
-		 if(impactedOrderReportUpdateWithSiteErrorsMap.containsKey(baseUSID))
-		   {
-			   
-		     ArrayList<String> values = impactedOrderReportUpdateWithSiteErrorsMap.get(baseUSID);
-		     String S ="USID is availabe on different sites >>";
-		     for(String s : values)
-		     {
-		    	 S+=s+",";
-		     }
-		     return S;
-		   }
-		 return error;
-	}
+
 
 }

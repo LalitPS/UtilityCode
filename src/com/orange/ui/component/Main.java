@@ -2222,12 +2222,12 @@ private class MyWindowAdapter extends WindowAdapter{
 	{
 	
 		
-		String ftpUserName 			= FTPSettings.getFtpUser();
-		String ftpUserPassword 		= FTPSettings.getFtpPassword();
-		String ftpURL 					= FTPSettings.getFtpURL();
-		String ftpFileName 			= FTPSettings.getFtpFileName();
-		String ftpLatestFileName	= FTPSettings.getFtpLatestFileName();
-		String ftpFileLocationName = FTPSettings.getFtpFileLocation();
+		String ftpUserName 				= FTPSettings.getFtpUser();
+		String ftpUserPassword 			= FTPSettings.getFtpPassword();
+		String ftpURL 							= FTPSettings.getFtpURL();
+		String ftpFileName 				= FTPSettings.getFtpFileName();
+		String ftpLatestFileName		= FTPSettings.getFtpLatestFileName();
+		String ftpFileLocationName 	= FTPSettings.getFtpFileLocation();
 		
 		FTPDownloader ftpDownloader = new FTPDownloader(ftpURL, ftpUserName, ftpUserPassword);
         ftpDownloader.downloadFile(ftpFileLocationName+ftpFileName, ftpLatestFileName);
@@ -2237,27 +2237,7 @@ private class MyWindowAdapter extends WindowAdapter{
         Thread.sleep(1000);
          pwin.dispose();
         Thread.sleep(1000);
-         /*
-        JOptionPane opt = new JOptionPane("<html><font color=orange size=3>Updated version has been successfully download as '"+ftpLatestFileName+"'.<br>Please don't close any process forcible way .. , Utility will restart with Updated version automatically.<br><font color=blue size=3>Will close automatically in 10 seconds.", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}); // no buttons
-        opt.setIcon(CommonUtils.getIcon(Icons.iconPath8));
-        final JDialog dlg = opt.createDialog("Information");
-		new Thread(new Runnable()
-        {
-          public void run()
-          {
-            try
-            {
-              Thread.sleep(10000);
-              dlg.dispose();
-            }
-            catch ( Throwable th )
-            {
-            }
-          }
-        }).start();
-		dlg.setAlwaysOnTop(true);
-		dlg.setVisible(true);
-		*/
+        
         String path="cmd /c start "+writeAutoInstallerBat();
         Runtime rn=Runtime.getRuntime();
         rn.exec(path);

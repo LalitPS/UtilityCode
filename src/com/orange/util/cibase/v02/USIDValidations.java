@@ -19,14 +19,30 @@ import com.orange.util.csm.OrderHierarchy;
 
 public class USIDValidations {
 
+	  private static Map<String,ArrayList<String>> impactedOrderReportUpdateMap ;
 	  private boolean isAnyFailed = false;
-	
+	  
 	  
       public USIDValidations()
       {
-    	   
+    	 
       }
       
+      public static void addValueInMap(String key,String value)
+    	{
+    		if(impactedOrderReportUpdateMap.containsKey(key))
+    		{
+    			ArrayList<String> values = impactedOrderReportUpdateMap.get(key);
+    			values.add(value);
+    			impactedOrderReportUpdateMap.put(key,values);
+    		}
+    		else
+    		{
+    			ArrayList<String> list = new ArrayList<String>();
+    			list.add(value);
+    			impactedOrderReportUpdateMap.put(key,list);
+    		}
+    	}
       
       public void setAnyFailed(boolean isAnyFailed) {
 		this.isAnyFailed = isAnyFailed;
@@ -45,7 +61,7 @@ public class USIDValidations {
       * Order <> contains both the USIDs 
        * 
        */
-      public void getUSIDValidation1(Map<String, ArrayList<String>> orderNUSIDMap,StringBuilder subDataTableBuilder)
+      public void getUSIDValidation1(String baseValue,Map<String, ArrayList<String>> orderNUSIDMap,StringBuilder subDataTableBuilder)
       {
             Iterator<Map.Entry<String, ArrayList<String>>> entries = orderNUSIDMap.entrySet().iterator();
             while (entries.hasNext()) 
@@ -69,6 +85,7 @@ public class USIDValidations {
                               V+=str+",";
                         }
                         String S="Order "+key+" contains both the USIDs ("+V+")";
+                        addValueInMap(baseValue, S);
                         subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
                         V = null;
                   }
@@ -86,7 +103,7 @@ public class USIDValidations {
       * USID exists on different new order 
        * 
        */
-      public void getUSIDValidation2(Map<String, ArrayList<String>> orderNTypeMap,StringBuilder subDataTableBuilder)
+      public void getUSIDValidation2(String baseValue,Map<String, ArrayList<String>> orderNTypeMap,StringBuilder subDataTableBuilder)
       {
             Iterator<Map.Entry<String, ArrayList<String>>> entries = orderNTypeMap.entrySet().iterator();
             while (entries.hasNext()) 
@@ -113,6 +130,7 @@ public class USIDValidations {
                               V+=str+",";
                         }
                         String S="USIDs(Existing AND/OR Target) is available on different new Order(s) ("+V+")";
+                        addValueInMap(baseValue, S);
                         subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
                         V = null;
                   }
@@ -128,7 +146,7 @@ public class USIDValidations {
       * Target USID is already present on different new order 
        * 
        */
-      public void getUSIDValidation3(Map<String, ArrayList<String>> targetOrderNTypeMap,StringBuilder subDataTableBuilder,LinkedHashSet<String> analysisQuotes,Imadaqv02ViewComponent imadaqv02ViewComponent)
+      public void getUSIDValidation3(String baseValue,Map<String, ArrayList<String>> targetOrderNTypeMap,StringBuilder subDataTableBuilder,LinkedHashSet<String> analysisQuotes,Imadaqv02ViewComponent imadaqv02ViewComponent)
       {
             TreeSet<Integer> sortAnalysisQuotes = new TreeSet<Integer>();
             if(null !=analysisQuotes && analysisQuotes.size()>0)
@@ -169,6 +187,7 @@ public class USIDValidations {
                               V+=str+",";
                         }
                         String S="Target USID is available on different new Orders. ("+V+")";
+                        addValueInMap(baseValue, S);
                         subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
                         V = null;
                   }
@@ -227,7 +246,9 @@ public class USIDValidations {
                                           }
                                           
                                          setAnyFailed(true);
-                                          String S="Target USID is available on new Order '"+findHierarchyOrder+"',following Orders are not in the chain ("+V+")<br><font color='black'>Updating this chain may lead errors.</font>";
+                                          String S  ="Target USID is available on new Order '"+findHierarchyOrder+"',following Orders are not in the chain ("+V+")<br><font color='black'>Updating this chain may lead errors.</font>";
+                                          String S1="Target USID is available on new Order '"+findHierarchyOrder+"',following Orders are not in the chain ("+V+")";
+                                          addValueInMap(baseValue, S1);
                                           subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
                                           V = null;
                                 
@@ -255,7 +276,7 @@ public class USIDValidations {
        * 
        * 
        */
-      public void getUSIDValidation4(LinkedHashSet<String> serviceData,StringBuilder subDataTableBuilder)
+      public void getUSIDValidation4(String baseValue,LinkedHashSet<String> serviceData,StringBuilder subDataTableBuilder)
       {
     	  serviceData = syncService(serviceData);
           ArrayList<String> value = new ArrayList<String>();
@@ -275,6 +296,7 @@ public class USIDValidations {
                       V+=str+",";
                 }
                 String S="Target USID already exists in CSI with another product. ("+V+")";
+                addValueInMap(baseValue, S);
                 subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
                 V = null;
           }
@@ -357,6 +379,7 @@ public class USIDValidations {
     	  {
     		  setAnyFailed(true);
     		  String S="Order "+quote+" not found in GOLD/Archival.";
+    		  addValueInMap(existingUSID, S);
               subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
     	  }
     	  /*
@@ -447,7 +470,9 @@ public class USIDValidations {
 			    	    	    	    }
 			    	    	    		setAnyFailed(true);
 			    	    	    	    String S="The Target USID ServiceElement belongs to different Service element categories. <FONT COLOR='BLUE'> Existing :'"+goldExisitingUSIDDetails.get(0)[1] +"' & Target :'"+goldNewUSIDDetails.get(0)[1]+"'</font>";
-			    	                    S+="<BR> (Quote '"+order+"' is  not a Commercial Migration change type and its found '"+chgType+"')";
+			    	    	    	    String S1="The Target USID ServiceElement belongs to different Service element categories.  Existing :'"+goldExisitingUSIDDetails.get(0)[1] +"' & Target :'"+goldNewUSIDDetails.get(0)[1]+"'";
+			    	    	    	    addValueInMap(existingUSID, S1);
+			    	    	    	    S+="<BR> (Quote '"+order+"' is  not a Commercial Migration change type and its found '"+chgType+"')";
 			    	    	    	    subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
 			    	    	    }
 	    	    		  }
@@ -458,6 +483,15 @@ public class USIDValidations {
     	  }// end of main if
     	  
       }// end of method
+
+	public static Map<String, ArrayList<String>> getImpactedOrderReportUpdateMap() {
+		return impactedOrderReportUpdateMap;
+	}
+
+	public static void setImpactedOrderReportUpdateMap(Map<String, ArrayList<String>> impactedOrderReportUpdateMap) {
+		USIDValidations.impactedOrderReportUpdateMap = impactedOrderReportUpdateMap;
+	}
+      
       
 }
 
