@@ -46,8 +46,8 @@ public class GenericJTree extends JTree {
 		  UIManager.put("Tree.closedIcon",   new ImageIcon(CommonUtils.setSizeImage(Icons.closeLeafIcon,15,15)));
 	}
 
-	TreeDragSource ds;
-    TreeDropTarget dt;
+	//TreeDragSource ds;
+   // TreeDropTarget dt;
 	  
 	public GenericJTree(DefaultTreeModel dtModel){
 		  super(dtModel);

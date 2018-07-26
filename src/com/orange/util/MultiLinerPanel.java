@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JScrollPane;
+import javax.swing.TransferHandler;
 
 import com.orange.ui.component.custom.CustomJCheckBox;
 import com.orange.ui.component.custom.CustomJFrame;
@@ -25,6 +26,7 @@ public class MultiLinerPanel
 		 panelList = new CustomJPanel();
 		 panelList.setLayout(new BoxLayout(panelList, BoxLayout.Y_AXIS));
 		 scrollPane = new JScrollPane(panelList);
+		 scrollPane.setTransferHandler(new TransferHandler("text"));
 		 jframe.getContentPane().add(scrollPane,BorderLayout.CENTER);
 		 jframe.setBounds(150, 150,600,400);
 	}

@@ -15,7 +15,7 @@ public class CustomJCheckBox extends JCheckBox {
 	public CustomJCheckBox()
 	{
 		super();
-		   Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		   Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	        if( properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") )
 			{
 	        	this.setBackground(CustomColorTheme.jcheckBoxColor);
@@ -23,7 +23,7 @@ public class CustomJCheckBox extends JCheckBox {
 	}
 	public CustomJCheckBox(String S){
 		super(S);
-		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	        if( properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") )
 			{
 	        	this.setBackground(CustomColorTheme.jcheckBoxColor);
@@ -32,7 +32,7 @@ public class CustomJCheckBox extends JCheckBox {
 	}
 	public CustomJCheckBox(String S,boolean b){
 		super(S,b);
-		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	        if( properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") )
 			{
 	        	this.setBackground(CustomColorTheme.jcheckBoxColor);

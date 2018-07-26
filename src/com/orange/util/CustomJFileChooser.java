@@ -20,7 +20,7 @@ public class CustomJFileChooser extends JFileChooser{
 	public CustomJFileChooser(){
 		super(Directories.BASEDIR);
 		
-		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 		
 		setCurrentDirectory( new File(properties.getProperty("DefaultBrowseLocation")));
 		setFileSelectionMode(CustomJFileChooser.FILES_ONLY);

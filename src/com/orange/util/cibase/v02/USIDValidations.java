@@ -315,7 +315,8 @@ public class USIDValidations {
        */
       public  void  isListedOrderAvailable(String quote,String existingUSID,Imadaqv02ViewComponent imadaqv02ViewComponent,StringBuilder subDataTableBuilder) throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, IOException
       {
-    	 
+    	  
+    	
     	  boolean isOrderAvailabe = false;
     	 
     	 
@@ -339,7 +340,7 @@ public class USIDValidations {
                   " AND LINEITEM. ORDERNUMBER=?";
     	  
     	  ArrayList<String[]> goldExisitingDetails  		   =CommonUtils.getQueryResult(GOLDLQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote);
-    	  
+    	
     	  if(null != goldExisitingDetails && goldExisitingDetails.size()>0)
     	  {
     		  isOrderAvailabe = true;
@@ -347,18 +348,21 @@ public class USIDValidations {
     	  else
     	  {
     		  ArrayList<String[]> archiveExisitingDetails  		=CommonUtils.getArchiveQueryResult(ARCHIVAL_LQL,imadaqv02ViewComponent,existingUSID,existingUSID,existingUSID,quote); 
-    	     if(null != archiveExisitingDetails && archiveExisitingDetails.size()>0)
+    	
+    	
+    		  if(null != archiveExisitingDetails && archiveExisitingDetails.size()>0)
     	     {
 	    	      isOrderAvailabe = true;
 		     }
     	  }
-    	  
-    	  if(!isOrderAvailabe)
+    	
+    	  if(!isOrderAvailabe )
     	  {
     		  setAnyFailed(true);
-    		  String S="Order "+quote+" not found in GOLD/Archival.";
+    		  String S="Order "+quote+" not found in GOLD/Archival. OR Existing USID is not availabe on given Order.";
               subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
     	  }
+    	 
     	
       }
       

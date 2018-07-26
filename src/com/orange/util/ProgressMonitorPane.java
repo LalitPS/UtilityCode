@@ -51,7 +51,7 @@ public class ProgressMonitorPane {
 		panel.setBorder(titled);
 		panel.setSize(300,50);
 		panel.add(progresslabel);
-		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 		if(properties.getProperty("ProgressMonitor").equalsIgnoreCase("YES"))
 		{
 			panel.setVisible(true);

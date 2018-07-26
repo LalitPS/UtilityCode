@@ -37,19 +37,15 @@ public class TreeFormation {
 
 		GenericJTree.addTreeSelectionListener(new TreeSelectionListener() {
 			public void valueChanged(TreeSelectionEvent e) {
-				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e
-						.getPath().getLastPathComponent();
+				DefaultMutableTreeNode node = (DefaultMutableTreeNode) e	.getPath().getLastPathComponent();
 				if (null != GenericJTree.getSelectionPath()) {
-					String path = GenericJTree.getSelectionPath().toString().trim()
-							.replace(", ", "\\");
-					String path1 = path.replace("\\", "\\\\").replace("[", "")
-							.replace("]", "");
-					if (new File(path1).isFile()) {
+					String path = GenericJTree.getSelectionPath().toString().trim().replace(", ", "\\");
+					String path1 = path.replace("\\", "\\\\").replace("[", "").replace("]", "");
+					if (new File(path1).isFile()) 
+					{
 						hsplitPane.setLeftComponent(new JScrollPane(GenericJTree));
 						try {
-							hsplitPane.setRightComponent(
-									viewer.addTab(	node.toString(), path1)
-									);
+							hsplitPane.setRightComponent(viewer.addTab(node.toString(), path1));
 						} catch (IOException E) {
 							CommonUtils.showExceptionStack(E);
 						}

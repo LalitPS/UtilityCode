@@ -47,7 +47,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -371,7 +370,7 @@ public class CommonUtils {
 	
 	public static String getConsiderableValue(){
 		
-		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 		if(properties.getProperty("CONSIDERABLE_VALUE").equalsIgnoreCase("CONSIDERABLE_VALUE_NEW"))
 		{
 			return CONSIDERABLE_VALUE_NEW;
@@ -1360,7 +1359,7 @@ public static JPanel getMemoryMonitorPane(int lwidth){
 	panel.add(heaplabel);
 	panel.add(statistics);
 	continiousThread(heaplabel,statistics);
-	Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+	Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	if(properties.getProperty("MemoryMonitor").equalsIgnoreCase("YES"))
 	{
 		panel.setVisible(true);
@@ -1410,8 +1409,12 @@ public static Window getProgressBar(int MAXVALUE,final String message,final bool
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
     window.setLocation(dim.width/2-window.getSize().width/2, dim.height/2-window.getSize().height/2);
     
-  
-    //window.setAlwaysOnTop(true);
+    Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
+    if(properties.getProperty("Wait_Monitor_Always_on_TOP").equalsIgnoreCase("YES"))
+	{
+    window.setAlwaysOnTop(true);
+	}
+	
     window.setVisible(true);
     
     new Thread(new Runnable()
@@ -2256,6 +2259,8 @@ public static void writeCustomConfigProp(boolean deleteIfExists) throws IOExcept
 	properties.setProperty("CONSIDERABLE_VALUE", "CONSIDERABLE_VALUE_NEW");
 	properties.setProperty("MAX_ROW_RECORDS", "50");
 	properties.setProperty("Theme", "STANDARD");
+	properties.setProperty("Wait_Monitor_Always_on_TOP", "YES");
+	properties.setProperty("UpLoadLogs", "YES");
 	
 	
 	File file1 = new File(Directories.customUserConfigFileLocationOLD);
@@ -2271,7 +2276,7 @@ public static void writeCustomConfigProp(boolean deleteIfExists) throws IOExcept
 		file1 = null;
 	}
 	
-	File file = new File(Directories.customUserConfigFileLocationV02);
+	File file = new File(Directories.customUserConfigFileLocationV03);
 	if(!file.exists() || deleteIfExists)
 	{
 	FileOutputStream fileOut = new FileOutputStream(file);
@@ -2354,7 +2359,7 @@ public static void setArchivalDBProperties(Properties archivalDBProperties) {
 
 public static int getMaxRecords()
 {
-	Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+	Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	return Integer.parseInt(properties.getProperty("MAX_ROW_RECORDS"));
 	
 	

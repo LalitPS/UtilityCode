@@ -1367,7 +1367,7 @@ private class ImadaqEvent implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
 			try {
-				new CustomProperties(Directories.customUserConfigFileLocationV02);
+				new CustomProperties(Directories.customUserConfigFileLocationV03);
 			} catch (IOException e) {
 				
 				e.printStackTrace();
@@ -2401,7 +2401,7 @@ private class MyWindowAdapter extends WindowAdapter{
 		   Properties props = new Properties();
            props.put("logoString", "GOLD"); 
            com.jtattoo.plaf.mint.MintLookAndFeel.setCurrentTheme(props);
-           Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+           Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 		   UIManager.setLookAndFeel(properties.getProperty("lookNFeel"));
 		   
 		   }catch(Exception e)
@@ -2511,7 +2511,7 @@ private class MyWindowAdapter extends WindowAdapter{
 		    if(installedVersion < availableVersion)
             {
             final String MSG = messages;
-            Properties properties1 = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+            Properties properties1 = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 			if(properties1.getProperty("VersionUpdateAlert").equalsIgnoreCase("YES"))
 			{
 	            final JOptionPane opt = new JOptionPane(MSG+"<html><br><font color=red size=3>Will close automatically in 30 seconds.", JOptionPane.INFORMATION_MESSAGE, JOptionPane.DEFAULT_OPTION, null, new Object[]{}); // no buttons
@@ -2594,9 +2594,15 @@ private class MyWindowAdapter extends WindowAdapter{
 				 }catch(Exception e){CommonUtils.showExceptionStack(e);}
 				 try
 				 {
-					System.out.println("Updating log details on remote server....Please wait.."); 
-					M.uploadLogs();
-					System.out.println("Log details uploded successfully...."); 
+				
+					 Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
+						if(properties.getProperty("UpLoadLogs").equalsIgnoreCase("YES"))
+						{ 
+							System.out.println("Updating log details on remote server....Please wait.."); 
+							M.uploadLogs();
+							System.out.println("Log details uploded successfully...."); 
+						}
+					 
 				  	M.loadDataBaseProp();
 			 	  }catch(Exception e){CommonUtils.showExceptionStack(e);}
 				
@@ -2691,6 +2697,13 @@ private class MyWindowAdapter extends WindowAdapter{
 		{
 			file.delete();
 		}
+		
+		File file2 = new File(Directories.customUserConfigFileLocationV02);
+		if(file2.exists())
+		{
+			file2.delete();
+		}
+		
 	}
 	
 	private String basePath;

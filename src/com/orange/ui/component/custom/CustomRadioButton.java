@@ -15,7 +15,7 @@ public class CustomRadioButton extends JRadioButton{
 
 	public CustomRadioButton(){
 		super();
-		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	        if( properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") )
 			{
 	        	this.setBackground(CustomColorTheme.jradioBoxColor);
@@ -24,7 +24,7 @@ public class CustomRadioButton extends JRadioButton{
 	}
 	public CustomRadioButton(String label){
 		super(label);
-		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	        if( properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") )
 			{
 	        	this.setBackground(CustomColorTheme.jradioBoxColor);
@@ -33,7 +33,7 @@ public class CustomRadioButton extends JRadioButton{
 	
 	public CustomRadioButton(String label,boolean isDefault){
 		super(label,isDefault);
-		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		 Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 	        if( properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") )
 			{
 	        	this.setBackground(CustomColorTheme.jradioBoxColor);

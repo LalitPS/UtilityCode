@@ -179,7 +179,7 @@ public class CustomProperties {
 			  try {
 				  CommonUtils.writeCustomConfigProp(true);	
 				  frame.dispose();
-				  new CustomProperties(Directories.customUserConfigFileLocationV02);
+				  new CustomProperties(Directories.customUserConfigFileLocationV03);
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

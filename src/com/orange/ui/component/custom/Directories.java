@@ -34,6 +34,7 @@ public class Directories {
 	public static String customUserConfigFileLocationOLD=HOME+File.separator+UserName+File.separator+"CustomUserConfig.properties";
 	public static String customUserConfigFileLocation=HOME+File.separator+UserName+File.separator+"CustomUserConfigV01.properties";
 	public static String customUserConfigFileLocationV02=HOME+File.separator+UserName+File.separator+"CustomUserConfigV02.properties";
+	public static String customUserConfigFileLocationV03=HOME+File.separator+UserName+File.separator+"CustomUserConfigV03.properties";
 	
 	public static String elkConfigFileLocation=HOME+File.separator+UserName+File.separator+"ELKConfig.properties";
 	

@@ -105,7 +105,7 @@ public class MemoryUsages {
 	        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	    	frame.setBounds(screenSize.width-220,screenSize.height*60/100,200,150);
 	    	
-	    	Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+	    	Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 			if(properties.getProperty("MemoryPulse").equalsIgnoreCase("YES"))
 			{
 				frame.setVisible(true);

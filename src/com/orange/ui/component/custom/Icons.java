@@ -8,7 +8,7 @@ public class Icons {
 	//http://www.iconarchive.com/search?q=software&page=5
 	//http://www.iconarchive.com/show/glossy-social-icons-by-social-media-icons.3.html
 
-		static Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		static Properties properties1 						= CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 		public static String database 					=  properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") ? "/resources/DataBase.png":"/resources_base/DataBase.png";
 		public static String databaseBG 				=  properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") ? "/resources/dbbk.jpg":"/resources_base/dbbk.jpg";
 		public static String helpIcon 						=  properties1.getProperty("Theme").equalsIgnoreCase("STANDARD") ? "/resources/Help.png":"/resources_base/Help.png";

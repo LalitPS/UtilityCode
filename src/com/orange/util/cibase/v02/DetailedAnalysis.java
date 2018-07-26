@@ -484,13 +484,14 @@ public class DetailedAnalysis
             isAnyFailed 							= checkUniquness(isAnyFailed,subDataTableBuilder,contrattingPartyICOData);
             isAnyFailed 							= checkUniquness(isAnyFailed,subDataTableBuilder,siteData);
             isAnyFailed 							= checkUniquness(isAnyFailed,subDataTableBuilder,serviceData);
-        
+           
             if(!isAnyFailed)
             {
                   subDataTableBuilder.append("\n<TD>"+PASS_TEXT+"</TD>");
             }
             else
             {
+            	
                   subDataTableBuilder.append("\n<TD>"+FAILED_TEXT+"</TD>");
             }
             
@@ -505,8 +506,18 @@ public class DetailedAnalysis
              		                     usidValidations.isListedOrderAvailable(quoteValue,baseValue,imadaqv02ViewComponent,subDataTableBuilder);
              		                     usidValidations.isSameServiceElementClass(baseValue,targetValue,imadaqv02ViewComponent,subDataTableBuilder);
                   
-           isAnyFailed = usidValidations.isAnyFailed();
+          
+          /*
+           * don't change the status of the boolean parameter if its status is being 'true' by previous validations.
+           * Previous validation are : site ,service and ICO
+           */
+           if(!isAnyFailed) 
+           {
+        	   isAnyFailed = usidValidations.isAnyFailed();
+           }
          
+         
+        
             /*
             * --------------
             * GEBERIC-COMMON CHECKS
@@ -541,7 +552,7 @@ public class DetailedAnalysis
             
             String S = subDataTableBuilder.toString();
             
-         
+       
             if(isAnyFailed)
             {
             	 TOTAL_FAILED ++;

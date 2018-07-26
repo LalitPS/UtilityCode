@@ -32,7 +32,7 @@ public class CustomJTable  {
 		jtable.setGridColor(Color.ORANGE);
 		try
 		{
-			Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+			Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 			if(properties.getProperty("TableScroll").equalsIgnoreCase("YES"))
 			{
 				jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
@@ -67,7 +67,7 @@ public class CustomJTable  {
 		
 		jtable.setAutoCreateRowSorter(true);
 		jtable.setGridColor(Color.ORANGE);
-		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV02);
+		Properties properties = CommonUtils.loadFTPConfigProp(Directories.customUserConfigFileLocationV03);
 		if(properties.getProperty("TableScroll").equalsIgnoreCase("YES"))
 		{
 			jtable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);	
