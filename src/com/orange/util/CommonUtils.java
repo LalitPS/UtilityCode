@@ -47,6 +47,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -1410,7 +1411,7 @@ public static Window getProgressBar(int MAXVALUE,final String message,final bool
     window.setLocation(dim.width/2-window.getSize().width/2, dim.height/2-window.getSize().height/2);
     
   
-    window.setAlwaysOnTop(true);
+    //window.setAlwaysOnTop(true);
     window.setVisible(true);
     
     new Thread(new Runnable()
