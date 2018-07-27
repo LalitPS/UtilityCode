@@ -93,7 +93,7 @@ import com.orange.util.SetInfoPanel;
 import com.orange.util.TreeFormation;
 import com.orange.util.cibase.v02.CiBase_IOV_Update_Latest;
 import com.orange.util.cibase.v02.CiBase_OKNAReader;
-import com.orange.util.cibase.v02.DetailedAnalysis;
+import com.orange.util.cibase.v02.DetailedAnalysisThreadExecutor;
 import com.orange.util.csm.DataTableCreator;
 import com.orange.util.csm.DedupFileDataValidator;
 import com.orange.util.csm.DedupFileValidator;
@@ -325,7 +325,8 @@ public class Main {
 						new Thread(new Runnable(){public void run(){try{
 							
 						MultiLinerPanel.getJframe().setVisible(true);
-						new DetailedAnalysis(imadaqv02ViewComponent,MultiLinerPanel.getListOfFile());
+						
+						new DetailedAnalysisThreadExecutor(imadaqv02ViewComponent,MultiLinerPanel.getListOfFile());
 							
 						 pwin.dispose();
 						 } catch ( Exception e){pwin.dispose();CommonUtils.printExceptionStack(e,imadaqv02ViewComponent);}}}).start();

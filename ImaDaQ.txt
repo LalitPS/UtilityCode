@@ -1,6 +1,6 @@
-8.09
+8.12
 META
-<html><font color=blue size=4><b>New Version 8.09 of Utility is availabe.Please download or Auto update with the latest version. </b>
+<html><font color=blue size=4><b>New Version 8.12 of Utility is availabe.Please download or Auto update with the latest version. </b>
 STEPS
 <html><font color=green>1. Connect to the FTP Machine
 <html><font color=green>2. Get the new jar 'Imadaq.jar'
@@ -8,6 +8,9 @@ STEPS
 <html><font color=green>4. Start your utility from bat file provided.
 <html><font color=orange size=4> OR ,Click on the 'Auto Update' from the running version of the utility from your machine. 
 
+<html><font color=green size=2><b>8.12: Update USID Migration Analysis report as per pre existing.
+<html><font color=green size=2><b>8.11: Add User Configurations for Wait Monitor and Load Logs.
+<html><font color=green size=2><b>8.10: ENHANCE USID VALIDATION UTILITY WITH ADDING SERVICE ELEMENT AND SERVICE MISMATCH , EXECUTION TIME VALIDATIONS.
 <html><font color=green size=2><b>8.08/09: ADD ELK (ellasticsearch,Kabina , logstash) CONFIGURATION FEATURE.
 <html><font color=green size=2><b>8.07: PUT QUERY LOGS ON REMOTE FEATURE.
 <html><font color=green size=2><b>8.06: ADD QUERY LOGS WITH QUERY START AND ENDS TIME WITH USER FTID.

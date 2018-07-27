@@ -35,7 +35,7 @@ import com.orange.util.ProgressMonitorPane;
  * we need to ad site , service validations in ,ap as well .
  */
 
-public class DetailedAnalysis 
+public class DetailedAnalysis implements Runnable
 {
       private Map<String, ArrayList<String>> oldUSIDEmptyMap,targetUSIDEmptyMap;
       private Map<String, ArrayList<String>> orderNUSIDMap;
@@ -147,187 +147,13 @@ public class DetailedAnalysis
       
       private int TOTAL_PASS		=0;
       private int TOTAL_FAILED	=0;
-      
-      public  DetailedAnalysis(Imadaqv02ViewComponent imadaqv02ViewComponent,ArrayList<File> files) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException
+      private Imadaqv02ViewComponent imadaqv02ViewComponent;
+      private File F;
+      public  DetailedAnalysis(Imadaqv02ViewComponent imadaqv02ViewComponent,File F) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException
       {
-    	  	
-            int totalrows = 0;
-                       
-            for(File F : files)
-            {
-            	   orderNUSIDMapForMigratedService =  new LinkedHashMap<String, ArrayList<String>>();
-            	   
-            	    Map<String,ArrayList<String>> impactedOrderReportUpdateMap  = new  LinkedHashMap<String,ArrayList<String>> () ;
-              	 	USIDValidations.setImpactedOrderReportUpdateMap(impactedOrderReportUpdateMap);
-              	 	
-
-		            String      baseFileName = F.getAbsolutePath();
-		            
-		            MultiLinerPanel.getCheckBox(baseFileName).setForeground(Color.ORANGE);
-		            
-		            CSVReader csvReaderT = new CSVReader(new FileReader(baseFileName));
-		            while ((csvReaderT.readNext()) != null) 
-		            {
-		                  totalrows++;
-		            }
-		            csvReaderT.close();
-            
-		           // ArrayList<String[]> allOrders = new ArrayList<String[]>();
-                        /*
-                        * 
-                         *  READ THE FILE 
-                         *  GET THE OK DATA,
-                        *  GET THE EXISTING USID
-                        */
-            
-                        String[] row = null;
-            
-                        ArrayList<String[]> writerRows = new ArrayList<String[]>();
-                        int count = 0;
-                        CSVReader br = new CSVReader(new FileReader(baseFileName));
-                        
-                        row = br.readNext();
-                        
-                        writerRows.add(addInRow(row, "DETAILED_ANALYSIS"));
-                        
-                        StringBuilder mainTableBuilder = new StringBuilder("<HTML>"+CSS+"\n<BODY>\n<TABLE class='altrowstable' id='alternatecolor' align='top'>\n");
-                        mainTableBuilder.append("\n<TR><TD COLSPAN='2' ALIGN='LEFT'>Analysis Start Time : "+CommonUtils.getDateFormat()+"<font color='blue'><br>DATABASES USED : >> GOLD : "+ConnectionBean.getDbName()+" >> CSI :"+ConnectionBeanCSI.getDbName()+" >> ARCHIVAL :"+ConnectionBeanArchived.getDbName()+"</font><br>Please note , Orders highlighted with <font color='#2F4F4F'>Gray color </font>are impacted Order(s).</TH></TR>\n");
-                        mainTableBuilder.append("\n<TR><TD COLSPAN='2'>\n<TABLE class='altrowstable' id='alternatecolor' align='top'>\n<TR><TD>TOTAL ANALYZED RECORDS</TD>\n<TD>TOTAL PASS RECORDS</TD>\n<TD>TOTAL FAILED RECORDS</TD>\n<TD>ORDERS_ON_MIGRATED_SERVICE</TD></TR>\n\n<TR><TD>TOTAL_RECORDS</TD>\n<TD>TOTAL_PASS_RECORDS</TD>\n<TD>TOTAL_FAILED_RECORDS</TD>\n<TD>ORDERS_ON_MIGRATED_SERVICE_LINK</TD></TR>\n</TABLE></TD></TR>\n");
-                        
-                        mainTableBuilder.append("\n<TR><TH>EXTRACT DATA </TH><TH>ANALYSIS</TH></TR>\n");
-                        
-                        //impactedOrderReportUpdateWithServiceErrorsMap = new   LinkedHashMap<String,ArrayList<String>> ();
-                       // impactedOrderReportUpdateWithSiteErrorsMap    = new   LinkedHashMap<String,ArrayList<String>> ();
-                        
-                       
-                   	 
-                        while ((row = br.readNext()) != null) 
-                        {   
-                               getAnalysisProcess(row,mainTableBuilder,imadaqv02ViewComponent,writerRows,baseFileName);
-                                count++;
-                               ProgressMonitorPane.getInstance().setProgress(count,(double)totalrows-1);
-                              
-                        }
-                        br.close();
-                        
-                        mainTableBuilder.append("<TR><TD COLSPAN='2'>Analysis Ends Time : "+CommonUtils.getDateFormat()+"</TD></TR></TABLE>\n</BODY>\n</HTML>\n");
-                       
-                        String path = baseFileName;   
-                        int index = path.lastIndexOf(".");
-                        String sub = path.substring(0,index) ;
-                  
-                        String HTMLFilePath=sub+"_Analysis.html";
-                        String Order_migrated_service_HTMLFilePath=sub+"_Analysis_ORDER_SERVICE.html";
-                        
-                        File file = new File(HTMLFilePath);
-                        File file1 = new File(Order_migrated_service_HTMLFilePath);
-                        
-                        
-                        
-                        String finalData = mainTableBuilder.toString().replace("TOTAL_RECORDS", ""+(totalrows-1));
-                        finalData = finalData.replace("TOTAL_PASS_RECORDS", ""+TOTAL_PASS);
-                        finalData = finalData.replace("TOTAL_FAILED_RECORDS", ""+TOTAL_FAILED);
-                        
-                        /*
-                         * FIND ORDERS ON MIGRATED SERVICES : PPL LIST
-                         * 
-                         */
-                       
-                        ArrayList<String[]> ordersNServices = ordersOnMigratedService(imadaqv02ViewComponent);
-                        if(null != ordersNServices && ordersNServices.size()>1)
-                        {
-                        finalData = finalData.replace("ORDERS_ON_MIGRATED_SERVICE_LINK", "<a href='./"+file1.getName()+"'>ORDERS_ON_MIGRATED_SERVICE_LINK</a>");
-                        }
-                        else
-                        {
-                        	finalData = finalData.replace("ORDERS_ON_MIGRATED_SERVICE_LINK","NO ORDER FOUND ON MIGRATED SERVICES");
-                          
-                        }
-                        
-                        BufferedWriter writer = null;
-                        try {
-                            writer = new BufferedWriter(new FileWriter(file));
-                            writer.write(finalData);
-                        } finally {
-                            if (writer != null) writer.close();
-                        }
-                        
-                        imadaqv02ViewComponent.getQueryResult().append("\nAnalysis file created successfully. "+HTMLFilePath);
-                        
-                        
-                        finalData = null;
-                        TOTAL_PASS = 0;
-                        TOTAL_FAILED= 0;
-                        totalrows = 0;
-                        
-                        
-                        
-                        CSVWriter bw = new CSVWriter(new FileWriter(sub+"_updated.csv"));
-                        bw.writeAll(writerRows);
-                        bw.close();
-                        writerRows =  null;
-                        imadaqv02ViewComponent.getQueryResult().append("\nfile updated successfully. "+sub+"_updated.csv");
-                        
-                        /*
-                         * ORDERS ON MIGRATED SERVICES FILE SHOULD BE CREATED ONLY 
-                         * IF ORDER/S FOUND ON MIGRATED SERVICE
-                         */
-                        if(null != ordersNServices && ordersNServices.size()>1)
-                        {
-                   
-			                        StringBuilder orderAndServiceTableBuilder = new StringBuilder("<HTML>"+CSS+"\n<BODY>\n<TABLE class='altrowstable' id='alternatecolor' align='top'>\n");
-			                        orderAndServiceTableBuilder.append("\n<TR><TD COLSPAN='2''><A HREF='./"+file.getName()+"' >BACK</A></TD><TD COLSPAN='10'>TOTAL ("+orderOnMSCount+") FOUND ON MIGRATED SERVICES.</TD></TR>\n");
-			                        orderOnMSCount = 0;
-			                        
-			                        for(String[] arR : ordersNServices)
-			                        {
-			                           orderAndServiceTableBuilder.append("\n<TR>");
-			                           for(String S : arR)
-			                           {
-			                        	   orderAndServiceTableBuilder.append("<TD>"+S+"</TD>\n");
-			                           }
-			                           orderAndServiceTableBuilder.append("\n</TR>");
-			                        }
-			                        orderAndServiceTableBuilder.append("<TABLE></BODY></HTML>");
-			                        
-			                         writer = null;
-			                        try 
-			                        {
-			                            writer = new BufferedWriter(new FileWriter(file1));
-			                            writer.write(orderAndServiceTableBuilder.toString());
-			                        
-			                        } finally {
-			                            if (writer != null) writer.close();
-			                        }
-			                        imadaqv02ViewComponent.getQueryResult().append("\nAnalysis ORDERS AND SERVICE file created successfully. "+Order_migrated_service_HTMLFilePath);
-			                        orderAndServiceTableBuilder = null;
-			                        Order_migrated_service_HTMLFilePath = null;
-                        }
-                        ordersNServices =  null;
-                        file  = null;
-                        file1 = null;
-                       
-                        if(imadaqv02ViewComponent.getIsCiBaseFileCreate().isSelected())
-                        {
-                        	new CiBase_IOV_Update_Latest(imadaqv02ViewComponent,sub+"_updated.csv");
-                        }
-                        /*
-                         * ADD SERVICE AND SITES CHECKS IN IMPACTED ORDER REPORT FILE.
-                         * PLEASE ENSURE FILE MUST BE AVAILABE ON THE LOCATION.
-                         * 
-                         */
-                        if(imadaqv02ViewComponent.getISUpdateImpactedOrderReport().isSelected())
-                        {
-                        	                         	 
-                        	new UpdateImpactedOrderReport(imadaqv02ViewComponent,baseFileName,USIDValidations.getImpactedOrderReportUpdateMap());
-                        	
-                        	USIDValidations.getImpactedOrderReportUpdateMap().clear();
-                        	impactedOrderReportUpdateMap = null;
-                        }
-                    
-                        MultiLinerPanel.getCheckBox(baseFileName).setSelected(false);  
-                        MultiLinerPanel.getCheckBox(baseFileName).setForeground(Color.BLUE);  
-            } // end of FOR loop     
+    	  	this.imadaqv02ViewComponent = imadaqv02ViewComponent;
+    	  	this.F = F;
+    	  		
            
       }
       
@@ -566,7 +392,11 @@ public class DetailedAnalysis
             subDataTableBuilder.append("\n</TR>");
             
             							USIDValidations usidValidations = new USIDValidations();
-            
+            							/*
+            							 * Target USID Format Check.
+            							 * 
+            							 */
+            							usidValidations.validateNewUSIDPattern(baseValue,targetValue,subDataTableBuilder);
 							            /*
 										  * quote not found in GOLD or ARCHIVE. 
 										  */
@@ -989,6 +819,187 @@ private void addValueInTargetOrderTypeMap(String key,String value){
     	
     	  return results;
       }
+
+	@Override
+	public void run() {
+		 try{
+			 	int totalrows = 0;
+		
+        	   orderNUSIDMapForMigratedService =  new LinkedHashMap<String, ArrayList<String>>();
+        	   
+        	    Map<String,ArrayList<String>> impactedOrderReportUpdateMap  = new  LinkedHashMap<String,ArrayList<String>> () ;
+          	 	USIDValidations.setImpactedOrderReportUpdateMap(impactedOrderReportUpdateMap);
+          	 	
+
+	            String      baseFileName = F.getAbsolutePath();
+	            
+	            MultiLinerPanel.getCheckBox(baseFileName).setForeground(Color.ORANGE);
+	            
+	            CSVReader csvReaderT = new CSVReader(new FileReader(baseFileName));
+	            while ((csvReaderT.readNext()) != null) 
+	            {
+	                  totalrows++;
+	            }
+	            csvReaderT.close();
+        
+	           // ArrayList<String[]> allOrders = new ArrayList<String[]>();
+                    /*
+                    * 
+                     *  READ THE FILE 
+                     *  GET THE OK DATA,
+                    *  GET THE EXISTING USID
+                    */
+        
+                    String[] row = null;
+        
+                    ArrayList<String[]> writerRows = new ArrayList<String[]>();
+                    int count = 0;
+                    CSVReader br = new CSVReader(new FileReader(baseFileName));
+                    
+                    row = br.readNext();
+                    
+                    writerRows.add(addInRow(row, "DETAILED_ANALYSIS"));
+                    
+                    StringBuilder mainTableBuilder = new StringBuilder("<HTML>"+CSS+"\n<BODY>\n<TABLE class='altrowstable' id='alternatecolor' align='top'>\n");
+                    mainTableBuilder.append("\n<TR><TD COLSPAN='2' ALIGN='LEFT'>Analysis Start Time : "+CommonUtils.getDateFormat()+"<font color='blue'><br>DATABASES USED : >> GOLD : "+ConnectionBean.getDbName()+" >> CSI :"+ConnectionBeanCSI.getDbName()+" >> ARCHIVAL :"+ConnectionBeanArchived.getDbName()+"</font><br>Please note , Orders highlighted with <font color='#2F4F4F'>Gray color </font>are impacted Order(s).</TH></TR>\n");
+                    mainTableBuilder.append("\n<TR><TD COLSPAN='2'>\n<TABLE class='altrowstable' id='alternatecolor' align='top'>\n<TR><TD>TOTAL ANALYZED RECORDS</TD>\n<TD>TOTAL PASS RECORDS</TD>\n<TD>TOTAL FAILED RECORDS</TD>\n<TD>ORDERS_ON_MIGRATED_SERVICE</TD></TR>\n\n<TR><TD>TOTAL_RECORDS</TD>\n<TD>TOTAL_PASS_RECORDS</TD>\n<TD>TOTAL_FAILED_RECORDS</TD>\n<TD>ORDERS_ON_MIGRATED_SERVICE_LINK</TD></TR>\n</TABLE></TD></TR>\n");
+                    
+                    mainTableBuilder.append("\n<TR><TH>EXTRACT DATA </TH><TH>ANALYSIS</TH></TR>\n");
+                    
+                    //impactedOrderReportUpdateWithServiceErrorsMap = new   LinkedHashMap<String,ArrayList<String>> ();
+                   // impactedOrderReportUpdateWithSiteErrorsMap    = new   LinkedHashMap<String,ArrayList<String>> ();
+                    
+                   
+               	    
+                    while ((row = br.readNext()) != null) 
+                    {   
+                           getAnalysisProcess(row,mainTableBuilder,imadaqv02ViewComponent,writerRows,baseFileName);
+                            count++;
+                           ProgressMonitorPane.getInstance().setProgress(count,(double)totalrows-1);
+                          
+                    }
+                    br.close();
+                    
+                    mainTableBuilder.append("<TR><TD COLSPAN='2'>Analysis Ends Time : "+CommonUtils.getDateFormat()+"</TD></TR></TABLE>\n</BODY>\n</HTML>\n");
+                   
+                    String path = baseFileName;   
+                    int index = path.lastIndexOf(".");
+                    String sub = path.substring(0,index) ;
+              
+                    String HTMLFilePath=sub+"_Analysis.html";
+                    String Order_migrated_service_HTMLFilePath=sub+"_Analysis_ORDER_SERVICE.html";
+                    
+                    File file = new File(HTMLFilePath);
+                    File file1 = new File(Order_migrated_service_HTMLFilePath);
+                    
+                    
+                    
+                    String finalData = mainTableBuilder.toString().replace("TOTAL_RECORDS", ""+(totalrows-1));
+                    finalData = finalData.replace("TOTAL_PASS_RECORDS", ""+TOTAL_PASS);
+                    finalData = finalData.replace("TOTAL_FAILED_RECORDS", ""+TOTAL_FAILED);
+                    
+                    /*
+                     * FIND ORDERS ON MIGRATED SERVICES : PPL LIST
+                     * 
+                     */
+                   
+                    ArrayList<String[]> ordersNServices = ordersOnMigratedService(imadaqv02ViewComponent);
+                    if(null != ordersNServices && ordersNServices.size()>1)
+                    {
+                    finalData = finalData.replace("ORDERS_ON_MIGRATED_SERVICE_LINK", "<a href='./"+file1.getName()+"'>ORDERS_ON_MIGRATED_SERVICE_LINK</a>");
+                    }
+                    else
+                    {
+                    	finalData = finalData.replace("ORDERS_ON_MIGRATED_SERVICE_LINK","NO ORDER FOUND ON MIGRATED SERVICES");
+                      
+                    }
+                    
+                    BufferedWriter writer = null;
+                    try {
+                        writer = new BufferedWriter(new FileWriter(file));
+                        writer.write(finalData);
+                    } finally {
+                        if (writer != null) writer.close();
+                    }
+                    
+                    imadaqv02ViewComponent.getQueryResult().append("\nAnalysis file created successfully. "+HTMLFilePath);
+                    
+                    
+                    finalData = null;
+                    TOTAL_PASS = 0;
+                    TOTAL_FAILED= 0;
+                    totalrows = 0;
+                    
+                    
+                    
+                    CSVWriter bw = new CSVWriter(new FileWriter(sub+"_updated.csv"));
+                    bw.writeAll(writerRows);
+                    bw.close();
+                    writerRows =  null;
+                    imadaqv02ViewComponent.getQueryResult().append("\nfile updated successfully. "+sub+"_updated.csv");
+                    
+                    /*
+                     * ORDERS ON MIGRATED SERVICES FILE SHOULD BE CREATED ONLY 
+                     * IF ORDER/S FOUND ON MIGRATED SERVICE
+                     */
+                    if(null != ordersNServices && ordersNServices.size()>1)
+                    {
+               
+		                        StringBuilder orderAndServiceTableBuilder = new StringBuilder("<HTML>"+CSS+"\n<BODY>\n<TABLE class='altrowstable' id='alternatecolor' align='top'>\n");
+		                        orderAndServiceTableBuilder.append("\n<TR><TD COLSPAN='2''><A HREF='./"+file.getName()+"' >BACK</A></TD><TD COLSPAN='10'>TOTAL ("+orderOnMSCount+") FOUND ON MIGRATED SERVICES.</TD></TR>\n");
+		                        orderOnMSCount = 0;
+		                        
+		                        for(String[] arR : ordersNServices)
+		                        {
+		                           orderAndServiceTableBuilder.append("\n<TR>");
+		                           for(String S : arR)
+		                           {
+		                        	   orderAndServiceTableBuilder.append("<TD>"+S+"</TD>\n");
+		                           }
+		                           orderAndServiceTableBuilder.append("\n</TR>");
+		                        }
+		                        orderAndServiceTableBuilder.append("<TABLE></BODY></HTML>");
+		                        
+		                         writer = null;
+		                        try 
+		                        {
+		                            writer = new BufferedWriter(new FileWriter(file1));
+		                            writer.write(orderAndServiceTableBuilder.toString());
+		                        
+		                        } finally {
+		                            if (writer != null) writer.close();
+		                        }
+		                        imadaqv02ViewComponent.getQueryResult().append("\nAnalysis ORDERS AND SERVICE file created successfully. "+Order_migrated_service_HTMLFilePath);
+		                        orderAndServiceTableBuilder = null;
+		                        Order_migrated_service_HTMLFilePath = null;
+                    }
+                    ordersNServices =  null;
+                    file  = null;
+                    file1 = null;
+                   
+                    if(imadaqv02ViewComponent.getIsCiBaseFileCreate().isSelected())
+                    {
+                    	new CiBase_IOV_Update_Latest(imadaqv02ViewComponent,sub+"_updated.csv");
+                    }
+                    /*
+                     * ADD SERVICE AND SITES CHECKS IN IMPACTED ORDER REPORT FILE.
+                     * PLEASE ENSURE FILE MUST BE AVAILABE ON THE LOCATION.
+                     * 
+                     */
+                    if(imadaqv02ViewComponent.getISUpdateImpactedOrderReport().isSelected())
+                    {
+                    	                         	 
+                    	new UpdateImpactedOrderReport(imadaqv02ViewComponent,baseFileName,USIDValidations.getImpactedOrderReportUpdateMap());
+                    	
+                    	USIDValidations.getImpactedOrderReportUpdateMap().clear();
+                    	impactedOrderReportUpdateMap = null;
+                    }
+                
+                    MultiLinerPanel.getCheckBox(baseFileName).setSelected(false);  
+                    MultiLinerPanel.getCheckBox(baseFileName).setForeground(Color.BLUE);  
+       
+	}catch(Exception E){ CommonUtils.showExceptionStack(E);}
+}
       
      
 }

@@ -9,6 +9,8 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.orange.ui.component.Imadaqv02ViewComponent;
 import com.orange.util.CommonUtils;
@@ -491,7 +493,32 @@ public class USIDValidations {
 	public static void setImpactedOrderReportUpdateMap(Map<String, ArrayList<String>> impactedOrderReportUpdateMap) {
 		USIDValidations.impactedOrderReportUpdateMap = impactedOrderReportUpdateMap;
 	}
-      
+	/**
+	 * There is a format defined for USID and new USID should be in following
+	 * format. <br>
+	 * 1.Character length 10 <br>
+	 * 2.First Two Character  - { A-Z } <br>
+	 * 3.3rd to 8th Character - { 0-9 } or { A-Z, a != ('O', 'I') } <br>
+	 * 4.9th and 10th character - { 0-9 } or { A-F }
+	 * 
+	 * @param newUSID
+	 * @return <i>true</i> if a valid USID else <i>false</i>
+	 */
+	public  boolean validateNewUSIDPattern(String existingUSID,String newUSID,StringBuilder subDataTableBuilder) {
+		String regex = "([A-Z]{2})([^OIa-z!-\\/:-@\\[-`{-~]{6})([0-9A-F]{2})";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher match = pattern.matcher(newUSID);
+		if (match.find()) 
+		{
+			return true;
+		}
+		setAnyFailed(true);
+		String S="The Target USID Pattern not match.";
+   	    addValueInMap(existingUSID, S);
+   	    subDataTableBuilder.append("\n<TR><TD COLSPAN='100'><font color='red'>"+S+"</font></TD></TR>\n");
+   	    
+		return false;
+	}
       
 }
 
